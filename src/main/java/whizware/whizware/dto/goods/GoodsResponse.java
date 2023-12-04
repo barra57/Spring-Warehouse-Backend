@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ResponseGoods {
-    private Long idGoods;
-    private String nameGoods;
+public class GoodsResponse {
+    private Long id;
+    private String name;
     private Long sellingPrice;
     private Long purchasePrice;
     private String description;
