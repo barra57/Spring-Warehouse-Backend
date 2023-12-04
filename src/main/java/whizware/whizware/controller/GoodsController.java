@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import whizware.whizware.dto.BaseResponse;
-import whizware.whizware.dto.goods.RequestGoods;
+import whizware.whizware.dto.goods.GoodsRequest;
 import whizware.whizware.service.GoodsService;
 
-@RequestMapping
-@RestController("/whizware")
+@RequestMapping("/goods")
+@RestController
 public class GoodsController {
 
     private final GoodsService goodsService;
@@ -18,33 +18,33 @@ public class GoodsController {
         this.goodsService = goodsService;
     }
 
-    @GetMapping("/goods")
-    public ResponseEntity<BaseResponse> getAllGods(@RequestBody RequestGoods requestGoods) {
-        BaseResponse responseGoods = goodsService.getAllGoods(requestGoods);
+    @GetMapping
+    public ResponseEntity<BaseResponse> getAllGods() {
+        BaseResponse responseGoods = goodsService.getAllGoods();
         return ResponseEntity.ok(responseGoods);
     }
 
-    @PostMapping("/goods")
-    public ResponseEntity<BaseResponse> saveGoods(@RequestBody RequestGoods requestGoods) {
-        BaseResponse baseResponse = goodsService.saveGoods(requestGoods);
+    @PostMapping
+    public ResponseEntity<BaseResponse> saveGoods(@RequestBody GoodsRequest goodsRequest) {
+        BaseResponse baseResponse = goodsService.saveGoods(goodsRequest);
         return ResponseEntity.ok(baseResponse);
     }
 
-    @PutMapping("/goods/{id}")
-    public ResponseEntity<BaseResponse> updateGoods(@PathVariable("id") Long id, @RequestBody RequestGoods requestGoods) {
-        BaseResponse baseResponse = goodsService.updateGoods(id, requestGoods);
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateGoods(@PathVariable("id") Long id, @RequestBody GoodsRequest goodsRequest) {
+        BaseResponse baseResponse = goodsService.updateGoods(id, goodsRequest);
         return ResponseEntity.ok(baseResponse);
     }
 
-    @DeleteMapping("/goods/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteGoods(@PathVariable("id") Long id) {
         BaseResponse responseGoods = goodsService.deleteIdGoods(id);
         return ResponseEntity.ok(responseGoods);
     }
 
-    @GetMapping("/goods/{id}")
-    public ResponseEntity<BaseResponse> getGoodsById(@PathVariable("id") Long id, @RequestBody RequestGoods requestGoods) {
-        BaseResponse baseResponse = goodsService.getGoodsById(id, requestGoods);
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse> getGoodsById(@PathVariable("id") Long id) {
+        BaseResponse baseResponse = goodsService.getGoodsById(id);
         return ResponseEntity.ok(baseResponse);
     }
 }

@@ -1,6 +1,5 @@
 package whizware.whizware.service;
 
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import whizware.whizware.dto.BaseResponse;
@@ -16,6 +15,7 @@ import java.util.Optional;
 public class GoodsService {
 
     private final GoodsRepository goodsRepository;
+
     @Autowired
     public GoodsService(GoodsRepository goodsRepository) {
         this.goodsRepository = goodsRepository;
@@ -23,17 +23,17 @@ public class GoodsService {
 
     private String condition = "Success";
 
-    @SneakyThrows
-    public BaseResponse saveGoods(RequestGoods requestGoods) {
+    public BaseResponse saveGoods(GoodsRequest goodsRequest) {
         Goods goods = new Goods();
-        goods.setNameGoods(requestGoods.getNameGoods());
-        goods.setDescription(requestGoods.getDescription());
-        goods.setSellingPrice(requestGoods.getSellingPrice());
-        goods.setSellingPrice(requestGoods.getSellingPrice());
+        goods.setName(goodsRequest.getName());
+        goods.setDescription(goodsRequest.getDescription());
+        goods.setSellingPrice(goodsRequest.getSellingPrice());
+        goods.setPurchasePrice(goodsRequest.getPurchasePrice());
         goodsRepository.save(goods);
 
-        ResponseGoods data = ResponseGoods.builder()
-                .nameGoods(goods.getNameGoods())
+        GoodsResponse data = GoodsResponse.builder()
+                .id(goods.getId())
+                .name(goods.getName())
                 .description(goods.getDescription())
                 .sellingPrice(goods.getSellingPrice())
                 .purchasePrice(goods.getPurchasePrice())
@@ -44,54 +44,55 @@ public class GoodsService {
                 .data(data)
                 .build();
     }
-    @SneakyThrows
-    public BaseResponse getAllGoods(RequestGoods requestGoods) {
-        List<ResponseGoods> responseGoods = new ArrayList<>();
+
+    public BaseResponse getAllGoods() {
+        List<GoodsResponse> goodResponses = new ArrayList<>();
         List<Goods> goods = goodsRepository.findAll();
         for (Goods g : goods) {
-            responseGoods.add(ResponseGoods.builder()
-                            .idGoods(g.getIdGoods())
-                            .nameGoods(g.getNameGoods())
-                            .description(g.getDescription())
-                            .sellingPrice(g.getSellingPrice())
-                            .purchasePrice(g.getPurchasePrice())
+            goodResponses.add(GoodsResponse.builder()
+                    .id(g.getId())
+                    .name(g.getName())
+                    .description(g.getDescription())
+                    .sellingPrice(g.getSellingPrice())
+                    .purchasePrice(g.getPurchasePrice())
                     .build());
         }
 
         return BaseResponse.builder()
                 .message(condition)
-                .data(responseGoods)
+                .data(goodResponses)
                 .build();
     }
-    @SneakyThrows
-    public BaseResponse updateGoods(Long id, RequestGoods requestGoods) {
+
+    public BaseResponse updateGoods(Long id, GoodsRequest goodsRequest) {
         Optional<Goods> optionalGoods = goodsRepository.findById(id);
-        Goods goods = new Goods();
-        if (!optionalGoods.isPresent() || !optionalGoods.get().getIdGoods().equals(id)) {
+        if (!optionalGoods.isPresent()) {
             return BaseResponse.builder()
                     .message("Gagal")
                     .data(null)
                     .build();
         }
-        else {
-            goods.setNameGoods(requestGoods.getNameGoods());
-            goods.setDescription(requestGoods.getDescription());
-            goods.setSellingPrice(requestGoods.getSellingPrice());
-            goods.setPurchasePrice(requestGoods.getPurchasePrice());
-            goodsRepository.save(goods);
-        }
-        ResponseGoods data = ResponseGoods.builder()
-                .nameGoods(requestGoods.getNameGoods())
-                .description(requestGoods.getDescription())
-                .sellingPrice(requestGoods.getSellingPrice())
-                .purchasePrice(requestGoods.getPurchasePrice())
+
+        Goods goods = optionalGoods.get();
+        goods.setName(goodsRequest.getName());
+        goods.setDescription(goodsRequest.getDescription());
+        goods.setSellingPrice(goodsRequest.getSellingPrice());
+        goods.setPurchasePrice(goodsRequest.getPurchasePrice());
+        goodsRepository.save(goods);
+
+        GoodsResponse data = GoodsResponse.builder()
+                .id(goods.getId())
+                .name(goods.getName())
+                .description(goods.getDescription())
+                .sellingPrice(goods.getSellingPrice())
+                .purchasePrice(goods.getPurchasePrice())
                 .build();
         return BaseResponse.builder()
                 .message("Berhasil")
                 .data(data)
                 .build();
     }
-    @SneakyThrows
+
     public BaseResponse deleteIdGoods(Long id) {
         Optional<Goods> optionalGoods = goodsRepository.findById(id);
 
@@ -109,16 +110,16 @@ public class GoodsService {
         }
     }
 
-    @SneakyThrows
-    public BaseResponse getGoodsById(Long id, RequestGoods requestGoods) {
+
+    public BaseResponse getGoodsById(Long id) {
         Optional<Goods> responseGoods = goodsRepository.findById(id);
         if (responseGoods.isPresent()) {
-            ResponseGoods data = ResponseGoods.builder()
-                    .idGoods(requestGoods.getIdGoods())
-                    .nameGoods(requestGoods.getNameGoods())
-                    .description(requestGoods.getDescription())
-                    .sellingPrice(requestGoods.getSellingPrice())
-                    .purchasePrice(requestGoods.getPurchasePrice())
+            GoodsResponse data = GoodsResponse.builder()
+                    .id(responseGoods.get().getId())
+                    .name(responseGoods.get().getName())
+                    .description(responseGoods.get().getDescription())
+                    .sellingPrice(responseGoods.get().getSellingPrice())
+                    .purchasePrice(responseGoods.get().getPurchasePrice())
                     .build();
 
             return BaseResponse.builder()

@@ -3,10 +3,9 @@ package whizware.whizware.dto.goods;
 import lombok.Data;
 
 @Data
-public class RequestGoods {
+public class GoodsRequest {
 
-    private Long idGoods;
-    private String nameGoods;
+    private String name;
     private Long sellingPrice;
     private Long purchasePrice;
     private String description;

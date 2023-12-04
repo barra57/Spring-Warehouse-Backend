@@ -11,9 +11,9 @@ import lombok.Data;
 public class Goods {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idGoods;
-    private String nameGoods;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
     private Long sellingPrice;
     private Long purchasePrice;
     private String description;
