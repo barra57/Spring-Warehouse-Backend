@@ -43,18 +43,23 @@ public class LocationService {
             location.setId(optLocation.get().getId());
             location.setName(request.getName());
             locationRepository.save(location);
+
+            LocationResponse data = LocationResponse.builder()
+                    .id(location.getId())
+                    .name(location.getName())
+                    .build();
+
+            return BaseResponse.builder()
+                    .message("Success update data!")
+                    .data(data)
+                    .build();
+        } else {
+            return BaseResponse.builder()
+                    .message("Fail update data with ID " + id)
+                    .data(null)
+                    .build();
         }
 
-
-        LocationResponse data = LocationResponse.builder()
-                .id(location.getId())
-                .name(location.getName())
-                .build();
-
-        return BaseResponse.builder()
-                .message("Success update data!")
-                .data(data)
-                .build();
     }
     
     public BaseResponse getAll() {
@@ -73,10 +78,18 @@ public class LocationService {
 
         Optional<Location> data = locationRepository.findById(id);
 
-        return BaseResponse.builder()
-                .message("Success get location with ID " + id + "!")
-                .data(data)
-                .build();
+        if (data.isPresent()) {
+            return BaseResponse.builder()
+                    .message("Success get location with ID " + id + "!")
+                    .data(data)
+                    .build();
+        } else {
+            return BaseResponse.builder()
+                    .message("Cannot find data with ID " + id)
+                    .data(null)
+                    .build();
+        }
+
     }
 
     public BaseResponse deleteLocation(Long id) {
