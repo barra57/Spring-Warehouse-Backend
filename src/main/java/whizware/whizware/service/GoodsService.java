@@ -1,4 +1,4 @@
-package whizware.whizware.services;
+package whizware.whizware.service;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;

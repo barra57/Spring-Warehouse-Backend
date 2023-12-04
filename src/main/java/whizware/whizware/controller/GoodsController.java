@@ -5,10 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.goods.RequestGoods;
-import whizware.whizware.dto.goods.ResponseGoods;
-import whizware.whizware.services.GoodsService;
-
-import java.util.List;
+import whizware.whizware.service.GoodsService;
 
 @RequestMapping
 @RestController("/whizware")
