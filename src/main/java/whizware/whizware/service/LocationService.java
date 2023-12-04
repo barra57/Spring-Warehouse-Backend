@@ -101,7 +101,7 @@ public class LocationService {
 
             return BaseResponse.builder()
                     .message("Success delete data with ID " + id)
-                    .data(data)
+                    .data(null)
                     .build();
         } else {
             return BaseResponse.builder()
