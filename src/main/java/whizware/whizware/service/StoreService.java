@@ -27,20 +27,27 @@ public class StoreService {
 
         Optional<Location> optLoc = locationRepository.findById(request.getLoc_id());
 
-        store.setName(request.getName());
-        store.setLocation(optLoc.get());
-        storeRepository.save(store);
+        if (optLoc.isPresent()) {
+            store.setName(request.getName());
+            store.setLocation(optLoc.get());
+            storeRepository.save(store);
 
-        StoreResponse data = StoreResponse.builder()
-                .id(store.getId())
-                .name(store.getName())
-                .loc_id(store.getLocation().getId())
-                .build();
+            StoreResponse data = StoreResponse.builder()
+                    .id(store.getId())
+                    .name(store.getName())
+                    .loc_id(store.getLocation().getId())
+                    .build();
 
-        return BaseResponse.builder()
-                .message("Success add new store!!")
-                .data(data)
-                .build();
+            return BaseResponse.builder()
+                    .message("Success add new store!!")
+                    .data(data)
+                    .build();
+        } else {
+            return BaseResponse.builder()
+                    .message("Failed added store data!!")
+                    .data(null)
+                    .build();
+        }
     }
 
     public BaseResponse updateStore(Long id, StoreRequest request) {
@@ -50,7 +57,7 @@ public class StoreService {
 
         Store store = new Store();
 
-        if (optStore.isPresent()) {
+        if (optStore.isPresent() && optLoc.isPresent()) {
             store.setId(optStore.get().getId());
             store.setName(request.getName());
             store.setLocation(optLoc.get());
@@ -59,7 +66,7 @@ public class StoreService {
             StoreResponse data = StoreResponse.builder()
                     .id(id)
                     .name(store.getName())
-                    .loc_id(store.getId())
+                    .loc_id(store.getLocation().getId())
                     .build();
 
             return BaseResponse.builder()
