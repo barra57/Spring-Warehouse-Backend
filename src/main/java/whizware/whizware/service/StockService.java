@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.stock.StockRequest;
 import whizware.whizware.dto.stock.StockResponse;
-import whizware.whizware.dto.warehouse.WarehouseResponse;
 import whizware.whizware.entity.Goods;
 import whizware.whizware.entity.Stock;
 import whizware.whizware.entity.Warehouse;
@@ -52,7 +51,7 @@ public class StockService {
         StockResponse data = StockResponse.builder()
                 .id(saveStock.getId())
                 .warehouseId(saveStock.getWarehouse().getId())
-                .goodsId(saveStock.getGoods().getIdGoods())
+                .goodsId(saveStock.getGoods().getId())
                 .qty(saveStock.getQty())
                 .build();
 
@@ -74,7 +73,7 @@ public class StockService {
         StockResponse data = StockResponse.builder()
                 .id(stock.get().getId())
                 .warehouseId(stock.get().getWarehouse().getId())
-                .goodsId(stock.get().getGoods().getIdGoods())
+                .goodsId(stock.get().getGoods().getId())
                 .qty(stock.get().getQty())
                 .build();
 
@@ -91,7 +90,7 @@ public class StockService {
             data.add(StockResponse.builder()
                             .id(s.getId())
                             .warehouseId(s.getWarehouse().getId())
-                            .goodsId(s.getGoods().getIdGoods())
+                            .goodsId(s.getGoods().getId())
                             .qty(s.getQty())
                     .build());
         }
@@ -137,7 +136,7 @@ public class StockService {
         StockResponse data = StockResponse.builder()
                 .id(updateStock.getId())
                 .warehouseId(updateStock.getWarehouse().getId())
-                .goodsId(updateStock.getGoods().getIdGoods())
+                .goodsId(updateStock.getGoods().getId())
                 .qty(updateStock.getQty())
                 .build();
 
