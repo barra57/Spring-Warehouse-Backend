@@ -39,4 +39,10 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateStore(@PathVariable("id") Long id, @RequestBody StoreRequest request) {
+        BaseResponse response = storeService.updateStore(id, request);
+        return ResponseEntity.ok(response);
+    }
+
 }
