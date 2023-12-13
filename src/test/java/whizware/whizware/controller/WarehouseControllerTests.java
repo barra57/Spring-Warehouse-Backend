@@ -3,9 +3,11 @@ package whizware.whizware.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import whizware.whizware.dto.BaseResponse;
@@ -19,7 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static whizware.whizware.util.TestUtilities.*;
 
+@ExtendWith(MockitoExtension.class)
 class WarehouseControllerTests {
 
     @InjectMocks
@@ -28,33 +32,11 @@ class WarehouseControllerTests {
     @Mock
     WarehouseService warehouseService;
 
-    @BeforeEach
-    void init() {
-        MockitoAnnotations.openMocks(this);
-    }
+//    @BeforeEach
+//    void init() {
+//        MockitoAnnotations.openMocks(this);
+//    }
 
-    WarehouseResponse generateWarehouseResponse(Long id, String name, Long locationId) {
-        return WarehouseResponse.builder()
-                .id(id)
-                .name(name)
-                .locationId(locationId)
-                .build();
-    }
-
-    WarehouseRequest generateWarehouseRequest(String name, Long locationId) {
-        WarehouseRequest request = new WarehouseRequest();
-        request.setName(name);
-        request.setLocationId(locationId);
-        return request;
-    }
-
-    Warehouse generateWarehouse(Long id, String name, Location location) {
-        Warehouse warehouse = new Warehouse();
-        warehouse.setId(id);
-        warehouse.setName(name);
-        warehouse.setLocation(location);
-        return warehouse;
-    }
 
     @Test
     void getAllWarehouses() {
@@ -126,7 +108,7 @@ class WarehouseControllerTests {
 
         WarehouseRequest request = generateWarehouseRequest("A", 2L);
 
-        String expectedMessage = "Warehouse succesfully added!";
+        String expectedMessage = "Warehouse succesfully added";
         WarehouseResponse expectedData = generateWarehouseResponse(id, request.getName(), request.getLocationId());
 
         BaseResponse expectedResponse = BaseResponse.builder()
