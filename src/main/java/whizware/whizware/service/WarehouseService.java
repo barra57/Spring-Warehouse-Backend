@@ -127,6 +127,7 @@ public class WarehouseService {
         warehouseRepository.delete(warehouse.get());
         return BaseResponse.builder()
                 .message("berhasil")
+                .data(warehouse.get())
                 .build();
     }
 

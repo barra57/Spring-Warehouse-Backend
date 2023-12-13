@@ -35,11 +35,11 @@ public class WarehouseController {
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> save(@PathVariable Long id, @RequestBody WarehouseRequest request) {
+    public ResponseEntity<BaseResponse> updated(@PathVariable Long id, @RequestBody WarehouseRequest request) {
         BaseResponse response = warehouseService.updateWarehouse(id, request);
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -48,7 +48,7 @@ public class WarehouseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> save(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> delete(@PathVariable Long id) {
         BaseResponse response = warehouseService.deleteWarehouse(id);
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
