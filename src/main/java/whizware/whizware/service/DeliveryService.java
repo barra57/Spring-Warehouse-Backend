@@ -113,7 +113,7 @@ public class DeliveryService {
         Optional<Store> store = storeRepository.findById(deliveryRequest.getStoreId());
         if (store.isEmpty()) {
             return BaseResponse.builder()
-                    .message("Store with ID " + deliveryRequest.getWarehouseId() + " is not found!")
+                    .message("Store with ID " + deliveryRequest.getStoreId() + " is not found!")
                     .data(null)
                     .build();
         }
@@ -122,7 +122,7 @@ public class DeliveryService {
         Optional<Goods> goods = goodsRepository.findById(deliveryRequest.getGoodsId());
         if (goods.isEmpty()) {
             return BaseResponse.builder()
-                    .message("Goods with ID " + deliveryRequest.getWarehouseId() + " is not found!")
+                    .message("Goods with ID " + deliveryRequest.getGoodsId() + " is not found!")
                     .data(null)
                     .build();
         }
@@ -173,7 +173,7 @@ public class DeliveryService {
         Optional<Store> store = storeRepository.findById(deliveryRequest.getStoreId());
         if (store.isEmpty()) {
             return BaseResponse.builder()
-                    .message("Store with ID " + deliveryRequest.getWarehouseId() + " is not found!")
+                    .message("Store with ID " + deliveryRequest.getStoreId() + " is not found!")
                     .data(null)
                     .build();
         }
@@ -182,7 +182,7 @@ public class DeliveryService {
         Optional<Goods> goods = goodsRepository.findById(deliveryRequest.getGoodsId());
         if (goods.isEmpty()) {
             return BaseResponse.builder()
-                    .message("Goods with ID " + deliveryRequest.getWarehouseId() + " is not found!")
+                    .message("Goods with ID " + deliveryRequest.getGoodsId() + " is not found!")
                     .data(null)
                     .build();
         }
