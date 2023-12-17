@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class WarehouseController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> save(@RequestBody WarehouseRequest request) {
+    public ResponseEntity<BaseResponse> save(@Valid @RequestBody WarehouseRequest request) {
         BaseResponse response = warehouseService.saveWarehouse(request);
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -39,7 +40,7 @@ public class WarehouseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updated(@PathVariable Long id, @RequestBody WarehouseRequest request) {
+    public ResponseEntity<BaseResponse> updated(@PathVariable Long id, @Valid @RequestBody WarehouseRequest request) {
         BaseResponse response = warehouseService.updateWarehouse(id, request);
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

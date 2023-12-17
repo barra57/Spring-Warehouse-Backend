@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,6 @@ public class TransferController {
 
     private final TransferService transferService;
 
-    @PostMapping
-    public ResponseEntity<BaseResponse> addTransfer(@RequestBody RequestTransfer request) {
-        BaseResponse response = transferService.addTransfer(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
     @GetMapping
     public ResponseEntity<BaseResponse> getAll() {
         BaseResponse response = transferService.getAll();
@@ -31,6 +26,12 @@ public class TransferController {
     public ResponseEntity<BaseResponse> getTransferById(@PathVariable("id") Long id) {
         BaseResponse response = transferService.getTransferById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<BaseResponse> addTransfer(@Valid @RequestBody RequestTransfer request) {
+        BaseResponse response = transferService.addTransfer(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 }

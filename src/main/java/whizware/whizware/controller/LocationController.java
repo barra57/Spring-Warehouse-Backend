@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,13 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse> addLoc(@RequestBody LocationRequest request) {
+    public ResponseEntity<BaseResponse> addLoc(@Valid @RequestBody LocationRequest request) {
         BaseResponse response = locationService.addLocation(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateLoc(@PathVariable("id") Long id, @RequestBody LocationRequest request) {
+    public ResponseEntity<BaseResponse> updateLoc(@PathVariable("id") Long id, @Valid @RequestBody LocationRequest request) {
         BaseResponse response = locationService.updateLocation(id, request);
         return ResponseEntity.ok(response);
     }

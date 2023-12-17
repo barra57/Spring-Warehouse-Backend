@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class DeliveryController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> saveDelivery(@RequestBody DeliveryRequest deliveryRequest) {
+    public ResponseEntity<BaseResponse> saveDelivery(@Valid @RequestBody DeliveryRequest deliveryRequest) {
         BaseResponse response = deliveryService.saveDelivery(deliveryRequest);
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

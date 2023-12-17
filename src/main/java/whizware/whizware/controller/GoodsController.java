@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +26,13 @@ public class GoodsController {
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> saveGoods(@RequestBody GoodsRequest goodsRequest) {
+    public ResponseEntity<BaseResponse> saveGoods(@Valid @RequestBody GoodsRequest goodsRequest) {
         BaseResponse baseResponse = goodsService.saveGoods(goodsRequest);
         return ResponseEntity.ok(baseResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateGoods(@PathVariable("id") Long id, @RequestBody GoodsRequest goodsRequest) {
+    public ResponseEntity<BaseResponse> updateGoods(@PathVariable("id") Long id, @Valid @RequestBody GoodsRequest goodsRequest) {
         BaseResponse baseResponse = goodsService.updateGoods(id, goodsRequest);
         return ResponseEntity.ok(baseResponse);
     }
