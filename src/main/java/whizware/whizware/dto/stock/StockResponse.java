@@ -10,5 +10,5 @@ public class StockResponse {
     private Long id;
     private Long warehouseId;
     private Long goodsId;
-    private Long qty;
+    private Long quantity;
 }

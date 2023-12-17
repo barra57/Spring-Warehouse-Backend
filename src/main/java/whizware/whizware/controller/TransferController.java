@@ -33,15 +33,4 @@ public class TransferController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateTransfer(@PathVariable("id") Long id, @RequestBody RequestTransfer request) {
-        BaseResponse response = transferService.updateTransfer(id, request);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteTransfer(@PathVariable("id") Long id) {
-        BaseResponse response = transferService.deleteTransfer(id);
-        return ResponseEntity.ok(response);
-    }
 }

@@ -14,5 +14,5 @@ public class Stock {
     private Warehouse warehouse;
     @ManyToOne
     private Goods goods;
-    private Long qty;
+    private Long quantity;
 }

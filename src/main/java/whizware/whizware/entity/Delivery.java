@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 @Entity
 @Data
@@ -24,9 +24,8 @@ public class Delivery {
     private Store store;
     @ManyToOne
     private Goods goods;
-    private Long qty;
+    private Long quantity;
     private BigDecimal totalPrice;
-    private String status;
     @JsonFormat(pattern = "DD-MM-yyyy")
     private Date date;
 

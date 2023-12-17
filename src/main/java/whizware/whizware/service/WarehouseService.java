@@ -43,7 +43,7 @@ public class WarehouseService {
         Optional<Warehouse> warehouse = warehouseRepository.findById(id);
         if (warehouse.isEmpty()) {
             return BaseResponse.builder()
-                    .message("warehouse with ID " + id + " not found")
+                    .message("Warehouse with ID " + id + " not found")
                     .data(null)
                     .build();
         }
@@ -66,7 +66,7 @@ public class WarehouseService {
         Optional<Location> location = locationRepository.findById(request.getLocationId());
         if (location.isEmpty()) {
             return BaseResponse.builder()
-                    .message("Location with ID " + request.getLocationId() + " is not found!")
+                    .message("Location with ID " + request.getLocationId() + " is not found")
                     .data(null)
                     .build();
         }
@@ -81,7 +81,7 @@ public class WarehouseService {
                 .build();
 
         return BaseResponse.builder()
-                .message("berhasil")
+                .message("Warehouse successfully added")
                 .data(data)
                 .build();
     }
@@ -112,7 +112,7 @@ public class WarehouseService {
                 .build();
 
         return BaseResponse.builder()
-                .message("berhasil")
+                .message("Warehouse successfully updated")
                 .data(data)
                 .build();
     }
@@ -126,7 +126,7 @@ public class WarehouseService {
         }
         warehouseRepository.delete(warehouse.get());
         return BaseResponse.builder()
-                .message("berhasil")
+                .message("Warehouse successfully deleted")
                 .data(warehouse.get())
                 .build();
     }

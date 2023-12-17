@@ -11,8 +11,5 @@ public class ReceiptRequest {
     private Long warehouseId;
     private Long goodsId;
     private Long quantity;
-    private BigDecimal totalPrice;
     private String suplier;
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date date;
 }

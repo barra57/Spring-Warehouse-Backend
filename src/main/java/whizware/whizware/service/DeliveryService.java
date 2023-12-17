@@ -1,18 +1,17 @@
 package whizware.whizware.service;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.delivery.DeliveryRequest;
 import whizware.whizware.dto.delivery.DeliveryResponse;
 import whizware.whizware.entity.*;
-import whizware.whizware.repository.DeliveryRepository;
-import whizware.whizware.repository.GoodsRepository;
-import whizware.whizware.repository.StoreRepository;
-import whizware.whizware.repository.WarehouseRepository;
+import whizware.whizware.repository.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +23,7 @@ public class DeliveryService {
     private final WarehouseRepository warehouseRepository;
     private final StoreRepository storeRepository;
     private final GoodsRepository goodsRepository;
+    private final StockRepository stockRepository;
 
     public BaseResponse getAllDelivery() {
         List<Delivery> delivery = deliveryRepository.findAll();
@@ -32,14 +32,13 @@ public class DeliveryService {
 
         for (Delivery deliv : delivery) {
             data.add(DeliveryResponse.builder()
-                            .id(deliv.getId())
-                            .warehouseId(deliv.getWarehouse().getId())
-                            .storeId(deliv.getStore().getId())
-                            .goodsId(deliv.getGoods().getId())
-                            .qty(deliv.getQty())
-                            .totalPrice(deliv.getTotalPrice())
-                            .status(deliv.getStatus())
-                            .date(deliv.getDate())
+                    .id(deliv.getId())
+                    .warehouseId(deliv.getWarehouse().getId())
+                    .storeId(deliv.getStore().getId())
+                    .goodsId(deliv.getGoods().getId())
+                    .quantity(deliv.getQuantity())
+                    .totalPrice(deliv.getTotalPrice())
+                    .date(deliv.getDate())
                     .build());
         }
 
@@ -55,14 +54,13 @@ public class DeliveryService {
         List<DeliveryResponse> data = new ArrayList<>();
         for (Delivery deliv : delivery) {
             data.add(DeliveryResponse.builder()
-                            .id(deliv.getId())
-                            .warehouseId(deliv.getWarehouse().getId())
-                            .storeId(deliv.getStore().getId())
-                            .goodsId(deliv.getGoods().getId())
-                            .qty(deliv.getQty())
-                            .totalPrice(deliv.getTotalPrice())
-                            .status(deliv.getStatus())
-                            .date(deliv.getDate())
+                    .id(deliv.getId())
+                    .warehouseId(deliv.getWarehouse().getId())
+                    .storeId(deliv.getStore().getId())
+                    .goodsId(deliv.getGoods().getId())
+                    .quantity(deliv.getQuantity())
+                    .totalPrice(deliv.getTotalPrice())
+                    .date(deliv.getDate())
                     .build());
         }
 
@@ -86,9 +84,8 @@ public class DeliveryService {
                 .warehouseId(delivery.get().getWarehouse().getId())
                 .storeId(delivery.get().getStore().getId())
                 .goodsId(delivery.get().getGoods().getId())
-                .qty(delivery.get().getQty())
+                .quantity(delivery.get().getQuantity())
                 .totalPrice(delivery.get().getTotalPrice())
-                .status(delivery.get().getStatus())
                 .date(delivery.get().getDate())
                 .build();
 
@@ -98,131 +95,62 @@ public class DeliveryService {
                 .build();
     }
 
-    public BaseResponse saveDelivery(DeliveryRequest deliveryRequest) {
+    public BaseResponse saveDelivery(DeliveryRequest request) {
+
+        Optional<Warehouse> warehouse = warehouseRepository.findById(request.getWarehouseId());
+        if (warehouse.isEmpty()) {
+            return BaseResponse.builder()
+                    .message("Warehouse with ID " + request.getWarehouseId() + " not found")
+                    .build();
+        }
+
+        Optional<Store> store = storeRepository.findById(request.getStoreId());
+        if (store.isEmpty()) {
+            return BaseResponse.builder()
+                    .message("Store with ID " + request.getStoreId() + " not found")
+                    .build();
+        }
+
+        Optional<Goods> goods = goodsRepository.findById(request.getGoodsId());
+        if (goods.isEmpty()) {
+            return BaseResponse.builder()
+                    .message("Goods with ID " + request.getStoreId() + " not found")
+                    .build();
+        }
+
+        List<Stock> stockList = stockRepository.findByWarehouseIdAndGoodsId(request.getWarehouseId(), request.getGoodsId());
+        if (stockList.isEmpty() || stockList.get(0).getQuantity() < request.getQuantity()) {
+            return BaseResponse.builder()
+                    .message("Warehouse " + warehouse.get().getName() + " doesn't have enough " + goods.get().getName())
+                    .build();
+        }
+
+        Stock stock = stockList.get(0);
+        stock.setWarehouse(warehouse.get());
+        stock.setGoods(goods.get());
+        stock.setQuantity(stock.getQuantity() - request.getQuantity());
+        stockRepository.save(stock);
+
         Delivery delivery = new Delivery();
-
-        Optional<Warehouse> warehouse = warehouseRepository.findById(deliveryRequest.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + deliveryRequest.getWarehouseId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
         delivery.setWarehouse(warehouse.get());
-
-        Optional<Store> store = storeRepository.findById(deliveryRequest.getStoreId());
-        if (store.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Store with ID " + deliveryRequest.getStoreId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
         delivery.setStore(store.get());
-
-        Optional<Goods> goods = goodsRepository.findById(deliveryRequest.getGoodsId());
-        if (goods.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Goods with ID " + deliveryRequest.getGoodsId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
         delivery.setGoods(goods.get());
-
-        delivery.setQty(deliveryRequest.getQty());
-        delivery.setTotalPrice(new BigDecimal(goods.get().getPurchasePrice() * deliveryRequest.getQty()));
-        delivery.setStatus(deliveryRequest.getStatus());
-        delivery.setDate(deliveryRequest.getDate());
-
-        Delivery saveDelivery = deliveryRepository.save(delivery);
-        DeliveryResponse data = DeliveryResponse.builder()
-                .id(saveDelivery.getId())
-                .warehouseId(saveDelivery.getWarehouse().getId())
-                .storeId(saveDelivery.getStore().getId())
-                .goodsId(saveDelivery.getGoods().getId())
-                .qty(saveDelivery.getQty())
-                .totalPrice(saveDelivery.getTotalPrice())
-                .status(saveDelivery.getStatus())
-                .date(saveDelivery.getDate())
-                .build();
+        delivery.setQuantity(request.getQuantity());
+        delivery.setTotalPrice(goods.get().getSellingPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
+        delivery.setDate(new Date());
+        Delivery savedDelivery = deliveryRepository.save(delivery);
 
         return BaseResponse.builder()
-                .message("Success Added data")
-                .data(data)
+                .message("Delivery success")
+                .data(DeliveryResponse.builder()
+                        .id(savedDelivery.getId())
+                        .warehouseId(savedDelivery.getWarehouse().getId())
+                        .goodsId(savedDelivery.getGoods().getId())
+                        .quantity(savedDelivery.getQuantity())
+                        .totalPrice(savedDelivery.getTotalPrice())
+                        .date(savedDelivery.getDate())
+                        .build())
                 .build();
     }
 
-    public BaseResponse updateDelivery(Long id, DeliveryRequest deliveryRequest) {
-        Optional<Delivery> deliveryOptional = deliveryRepository.findById(id);
-        if (deliveryOptional.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Delivery with ID " + id + " Not found")
-                    .data(null)
-                    .build();
-        }
-        Delivery delivery = deliveryOptional.get();
-
-        Optional<Warehouse> warehouse = warehouseRepository.findById(deliveryRequest.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + deliveryRequest.getWarehouseId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
-        delivery.setWarehouse(warehouse.get());
-
-        Optional<Store> store = storeRepository.findById(deliveryRequest.getStoreId());
-        if (store.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Store with ID " + deliveryRequest.getStoreId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
-        delivery.setStore(store.get());
-
-        Optional<Goods> goods = goodsRepository.findById(deliveryRequest.getGoodsId());
-        if (goods.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Goods with ID " + deliveryRequest.getGoodsId() + " is not found!")
-                    .data(null)
-                    .build();
-        }
-        delivery.setGoods(goods.get());
-
-        delivery.setQty(deliveryRequest.getQty());
-        delivery.setTotalPrice(new BigDecimal(goods.get().getPurchasePrice() * deliveryRequest.getQty()));
-        delivery.setStatus(deliveryRequest.getStatus());
-        delivery.setDate(deliveryRequest.getDate());
-
-        Delivery saveDelivery = deliveryRepository.save(delivery);
-        DeliveryResponse data = DeliveryResponse.builder()
-                .id(saveDelivery.getId())
-                .warehouseId(saveDelivery.getWarehouse().getId())
-                .storeId(saveDelivery.getStore().getId())
-                .goodsId(saveDelivery.getGoods().getId())
-                .qty(saveDelivery.getQty())
-                .totalPrice(saveDelivery.getTotalPrice())
-                .status(saveDelivery.getStatus())
-                .date(saveDelivery.getDate())
-                .build();
-
-        return BaseResponse.builder()
-                .message("Success Updated data with ID " + id)
-                .data(data)
-                .build();
-    }
-
-    public BaseResponse deleteDelivery(Long id) {
-        Optional<Delivery> delivery = deliveryRepository.findById(id);
-        if (delivery.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Delivery with ID " + id + " is not found!")
-                    .data(null)
-                    .build();
-        }
-        deliveryRepository.delete(delivery.get());
-        return BaseResponse.builder()
-                .message("Delete Success...")
-                .data(null)
-                .build();
-    }
 }

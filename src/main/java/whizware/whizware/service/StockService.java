@@ -24,42 +24,42 @@ public class StockService {
     private final WarehouseRepository warehouseRepository;
     private final GoodsRepository goodsRepository;
 
-    public BaseResponse saveStock(StockRequest stockRequest) {
-        Stock stock = new Stock();
-
-        Optional<Warehouse> warehouse = warehouseRepository.findById(stockRequest.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + stockRequest.getWarehouseId() + " Not found" )
-                    .data(null)
-                    .build();
-        }
-
-        Optional<Goods> goods = goodsRepository.findById(stockRequest.getGoodsId());
-        if (goods.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Goods with ID " + stockRequest.getGoodsId() + " Not found")
-                    .data(null)
-                    .build();
-        }
-
-        stock.setWarehouse(warehouse.get());
-        stock.setGoods(goods.get());
-        stock.setQty(stockRequest.getQty());
-        Stock saveStock = stockRepository.save(stock);
-
-        StockResponse data = StockResponse.builder()
-                .id(saveStock.getId())
-                .warehouseId(saveStock.getWarehouse().getId())
-                .goodsId(saveStock.getGoods().getId())
-                .qty(saveStock.getQty())
-                .build();
-
-        return BaseResponse.builder()
-                .message("Success add data")
-                .data(data)
-                .build();
-    }
+//    public BaseResponse saveStock(StockRequest stockRequest) {
+//        Stock stock = new Stock();
+//
+//        Optional<Warehouse> warehouse = warehouseRepository.findById(stockRequest.getWarehouseId());
+//        if (warehouse.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Warehouse with ID " + stockRequest.getWarehouseId() + " Not found" )
+//                    .data(null)
+//                    .build();
+//        }
+//
+//        Optional<Goods> goods = goodsRepository.findById(stockRequest.getGoodsId());
+//        if (goods.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Goods with ID " + stockRequest.getGoodsId() + " Not found")
+//                    .data(null)
+//                    .build();
+//        }
+//
+//        stock.setWarehouse(warehouse.get());
+//        stock.setGoods(goods.get());
+//        stock.setQuantity(stockRequest.getQty());
+//        Stock saveStock = stockRepository.save(stock);
+//
+//        StockResponse data = StockResponse.builder()
+//                .id(saveStock.getId())
+//                .warehouseId(saveStock.getWarehouse().getId())
+//                .goodsId(saveStock.getGoods().getId())
+//                .quantity(saveStock.getQuantity())
+//                .build();
+//
+//        return BaseResponse.builder()
+//                .message("Success add data")
+//                .data(data)
+//                .build();
+//    }
 
     public BaseResponse getStockById(Long id) {
         Optional<Stock> stock = stockRepository.findById(id);
@@ -74,7 +74,7 @@ public class StockService {
                 .id(stock.get().getId())
                 .warehouseId(stock.get().getWarehouse().getId())
                 .goodsId(stock.get().getGoods().getId())
-                .qty(stock.get().getQty())
+                .quantity(stock.get().getQuantity())
                 .build();
 
         return BaseResponse.builder()
@@ -91,7 +91,7 @@ public class StockService {
                             .id(s.getId())
                             .warehouseId(s.getWarehouse().getId())
                             .goodsId(s.getGoods().getId())
-                            .qty(s.getQty())
+                            .quantity(s.getQuantity())
                     .build());
         }
 
@@ -101,63 +101,63 @@ public class StockService {
                 .build();
     }
 
-    public BaseResponse updateStock(Long id, StockRequest stockRequest) {
+//    public BaseResponse updateStock(Long id, StockRequest stockRequest) {
+//
+//        Optional<Stock> stockOptional = stockRepository.findById(id);
+//        if (stockOptional.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Stock with ID " + id + " Not found" )
+//                    .data(null)
+//                    .build();
+//        }
+//        Stock stock = stockOptional.get();
+//
+//        Optional<Warehouse> warehouse = warehouseRepository.findById(stockRequest.getWarehouseId());
+//        if (warehouse.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Warehouse with ID " + stockRequest.getWarehouseId() + " Not found" )
+//                    .data(null)
+//                    .build();
+//        }
+//        stock.setWarehouse(warehouse.get());
+//
+//        Optional<Goods> goods = goodsRepository.findById(stockRequest.getGoodsId());
+//        if (goods.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Goods with ID " + stockRequest.getGoodsId() + " Not found")
+//                    .data(null)
+//                    .build();
+//        }
+//        stock.setGoods(goods.get());
+//
+//        stock.setQuantity(stockRequest.getQty());
+//        Stock updateStock = stockRepository.save(stock);
+//
+//        StockResponse data = StockResponse.builder()
+//                .id(updateStock.getId())
+//                .warehouseId(updateStock.getWarehouse().getId())
+//                .goodsId(updateStock.getGoods().getId())
+//                .quantity(updateStock.getQuantity())
+//                .build();
+//
+//        return BaseResponse.builder()
+//                .message("Success")
+//                .data(data)
+//                .build();
+//    }
 
-        Optional<Stock> stockOptional = stockRepository.findById(id);
-        if (stockOptional.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Stock with ID " + id + " Not found" )
-                    .data(null)
-                    .build();
-        }
-        Stock stock = stockOptional.get();
-
-        Optional<Warehouse> warehouse = warehouseRepository.findById(stockRequest.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + stockRequest.getWarehouseId() + " Not found" )
-                    .data(null)
-                    .build();
-        }
-        stock.setWarehouse(warehouse.get());
-
-        Optional<Goods> goods = goodsRepository.findById(stockRequest.getGoodsId());
-        if (goods.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Goods with ID " + stockRequest.getGoodsId() + " Not found")
-                    .data(null)
-                    .build();
-        }
-        stock.setGoods(goods.get());
-
-        stock.setQty(stockRequest.getQty());
-        Stock updateStock = stockRepository.save(stock);
-
-        StockResponse data = StockResponse.builder()
-                .id(updateStock.getId())
-                .warehouseId(updateStock.getWarehouse().getId())
-                .goodsId(updateStock.getGoods().getId())
-                .qty(updateStock.getQty())
-                .build();
-
-        return BaseResponse.builder()
-                .message("Success")
-                .data(data)
-                .build();
-    }
-
-    public BaseResponse deleteStockById(Long id) {
-        Optional<Stock> stockOptional = stockRepository.findById(id);
-        if (stockOptional.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Stock with ID " + id + " Not found" )
-                    .data(null)
-                    .build();
-        }
-        stockRepository.delete(stockOptional.get());
-        return BaseResponse.builder()
-                .message("Berhasil terhapus")
-                .data(null)
-                .build();
-    }
+//    public BaseResponse deleteStockById(Long id) {
+//        Optional<Stock> stockOptional = stockRepository.findById(id);
+//        if (stockOptional.isEmpty()) {
+//            return BaseResponse.builder()
+//                    .message("Stock with ID " + id + " Not found" )
+//                    .data(null)
+//                    .build();
+//        }
+//        stockRepository.delete(stockOptional.get());
+//        return BaseResponse.builder()
+//                .message("Berhasil terhapus")
+//                .data(null)
+//                .build();
+//    }
 }

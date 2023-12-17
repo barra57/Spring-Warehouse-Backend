@@ -12,9 +12,5 @@ public class DeliveryRequest {
     private Long warehouseId;
     private Long storeId;
     private Long goodsId;
-    private Long qty;
-    private BigDecimal totalPrice;
-    private String status;
-    @JsonFormat(pattern = "DD-MM-yyyy")
-    private Date date;
+    private Long quantity;
 }

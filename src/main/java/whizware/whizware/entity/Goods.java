@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 public class Goods {
@@ -14,8 +16,8 @@ public class Goods {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Long sellingPrice;
-    private Long purchasePrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal purchasePrice;
     private String description;
 
 }

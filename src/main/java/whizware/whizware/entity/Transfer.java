@@ -16,12 +16,11 @@ public class Transfer {
     @ManyToOne
     private Warehouse warehouse;
     @ManyToOne
-    private Warehouse warehouse_target;
+    private Warehouse warehouseTarget;
     @ManyToOne
     private Goods goods;
 
     private Integer quantity;
-    private String status;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date date;
 }

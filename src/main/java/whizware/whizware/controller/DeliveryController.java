@@ -43,24 +43,7 @@ public class DeliveryController {
         if (response.getData() == null) {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateDelivery(@PathVariable Long id, @RequestBody DeliveryRequest deliveryRequest) {
-        BaseResponse response = deliveryService.updateDelivery(id, deliveryRequest);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteDelivery(@PathVariable Long id) {
-        BaseResponse response = deliveryService.deleteDelivery(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
 }
