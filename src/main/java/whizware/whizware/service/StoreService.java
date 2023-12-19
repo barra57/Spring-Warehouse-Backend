@@ -52,7 +52,7 @@ public class StoreService {
 
     public BaseResponse updateStore(Long id, StoreRequest request) {
 
-        Optional<Store> optStore = storeRepository.findById(request.getId());
+        Optional<Store> optStore = storeRepository.findById(id);
         Optional<Location> optLoc = locationRepository.findById(request.getLoc_id());
 
         Store store = new Store();
