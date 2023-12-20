@@ -18,20 +18,17 @@ public class TransferController {
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAll() {
-        BaseResponse response = transferService.getAll();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(transferService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getTransferById(@PathVariable("id") Long id) {
-        BaseResponse response = transferService.getTransferById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(transferService.getTransferById(id));
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse> addTransfer(@Valid @RequestBody RequestTransfer request) {
-        BaseResponse response = transferService.addTransfer(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(transferService.addTransfer(request), HttpStatus.CREATED);
     }
 
 }

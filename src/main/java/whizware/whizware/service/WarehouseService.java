@@ -7,12 +7,13 @@ import whizware.whizware.dto.warehouse.WarehouseRequest;
 import whizware.whizware.dto.warehouse.WarehouseResponse;
 import whizware.whizware.entity.Location;
 import whizware.whizware.entity.Warehouse;
+import whizware.whizware.exception.NoContentException;
+import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.LocationRepository;
 import whizware.whizware.repository.WarehouseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,9 @@ public class WarehouseService {
 
     public BaseResponse getAllWarehouses() {
         List<Warehouse> warehouses = warehouseRepository.findAll();
+        if (warehouses.isEmpty()) {
+            throw new NoContentException("Warehouse is empty");
+        }
 
         List<WarehouseResponse> data = new ArrayList<>();
         for (Warehouse warehouse : warehouses) {
@@ -34,44 +38,32 @@ public class WarehouseService {
         }
 
         return BaseResponse.builder()
-                .message("berhasil")
+                .message("Success")
                 .data(data)
                 .build();
     }
 
     public BaseResponse getWarehouseById(Long id) {
-        Optional<Warehouse> warehouse = warehouseRepository.findById(id);
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + id + " not found")
-                    .data(null)
-                    .build();
-        }
+        Warehouse warehouse = warehouseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Warehouse with ID %d not found", id)));
 
         WarehouseResponse data = WarehouseResponse.builder()
-                .id(warehouse.get().getId())
-                .name(warehouse.get().getName())
-                .locationId(warehouse.get().getLocation().getId())
+                .id(warehouse.getId())
+                .name(warehouse.getName())
+                .locationId(warehouse.getLocation().getId())
                 .build();
 
         return BaseResponse.builder()
-                .message("berhasil")
+                .message("Success")
                 .data(data)
                 .build();
     }
 
     public BaseResponse saveWarehouse(WarehouseRequest request) {
+        Location location = locationRepository.findById(request.getLocationId()).orElseThrow(() -> new NotFoundException(String.format("Location with ID %d not found", request.getLocationId())));
+
         Warehouse warehouse = new Warehouse();
         warehouse.setName(request.getName());
-        Optional<Location> location = locationRepository.findById(request.getLocationId());
-        if (location.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Location with ID " + request.getLocationId() + " is not found")
-                    .data(null)
-                    .build();
-        }
-        warehouse.setLocation(location.get());
-
+        warehouse.setLocation(location);
         Warehouse savedWarehouse = warehouseRepository.save(warehouse);
 
         WarehouseResponse data = WarehouseResponse.builder()
@@ -87,21 +79,10 @@ public class WarehouseService {
     }
 
     public BaseResponse updateWarehouse(Long id, WarehouseRequest request) {
-        Optional<Warehouse> warehouseOptional = warehouseRepository.findById(id);
-        if (warehouseOptional.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + id + " not found")
-                    .build();
-        }
+        Warehouse warehouse = warehouseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Warehouse with ID %d not found", id)));
+        Location location = locationRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Location with ID %d not found", request.getLocationId())));
 
-        Warehouse warehouse = warehouseOptional.get();
-        Optional<Location> location = locationRepository.findById(request.getLocationId());
-        if (location.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Location with ID " + id + " not found")
-                    .build();
-        }
-        warehouse.setLocation(location.get());
+        warehouse.setLocation(location);
         warehouse.setName(request.getName());
         Warehouse updatedWarehouse = warehouseRepository.save(warehouse);
 
@@ -118,16 +99,10 @@ public class WarehouseService {
     }
 
     public BaseResponse deleteWarehouse(Long id) {
-        Optional<Warehouse> warehouse = warehouseRepository.findById(id);
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + id + " not found")
-                    .build();
-        }
-        warehouseRepository.delete(warehouse.get());
+        Warehouse warehouse = warehouseRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Warehouse with ID %d not found", id)));
+        warehouseRepository.delete(warehouse);
         return BaseResponse.builder()
                 .message("Warehouse successfully deleted")
-                .data(warehouse.get())
                 .build();
     }
 

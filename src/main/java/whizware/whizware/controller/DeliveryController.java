@@ -21,30 +21,17 @@ public class DeliveryController {
         if (warehouseId == null) {
             return ResponseEntity.ok(deliveryService.getAllDelivery());
         }
-
-        BaseResponse response = deliveryService.getAllDeliveryByWarehouseId(warehouseId);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(deliveryService.getAllDeliveryByWarehouseId(warehouseId));
     }
 
     @GetMapping("/{id}")
     public  ResponseEntity<BaseResponse> getDeliveryById(@PathVariable Long id) {
-        BaseResponse response = deliveryService.getDeliveryById(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(deliveryService.getDeliveryById(id));
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse> saveDelivery(@Valid @RequestBody DeliveryRequest deliveryRequest) {
-        BaseResponse response = deliveryService.saveDelivery(deliveryRequest);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(deliveryService.saveDelivery(deliveryRequest), HttpStatus.CREATED);
     }
 
 }

@@ -16,6 +16,8 @@ import whizware.whizware.entity.Goods;
 import whizware.whizware.entity.Receipt;
 import whizware.whizware.entity.Stock;
 import whizware.whizware.entity.Warehouse;
+import whizware.whizware.exception.NoContentException;
+import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.GoodsRepository;
 import whizware.whizware.repository.ReceiptRepository;
 import whizware.whizware.repository.StockRepository;
@@ -24,14 +26,16 @@ import whizware.whizware.repository.WarehouseRepository;
 @Service
 @RequiredArgsConstructor
 public class ReceiptService {
+    public final StockService stockService;
 
     public final ReceiptRepository receiptRepository;
     public final WarehouseRepository warehouseRepository;
     public final GoodsRepository goodsRepository;
-    public final StockRepository stockRepository;
 
     public BaseResponse getAllReceipt() {
         List<Receipt> receipts = receiptRepository.findAll();
+        if (receipts.isEmpty())
+            throw new NoContentException("Receipt is empty");
 
         List<ReceiptResponse> data = new ArrayList<>();
         for (Receipt receipt : receipts) {
@@ -53,21 +57,16 @@ public class ReceiptService {
     }
 
     public BaseResponse getReceiptById(Long id) {
-        Optional<Receipt> receipt = receiptRepository.findById(id);
-        if (receipt.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Receipt with ID " + id + " is not found!")
-                    .build();
-        }
+        Receipt receipt = receiptRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Receipt with ID %d is not found!", id)));
 
         ReceiptResponse data = ReceiptResponse.builder()
-                .id(receipt.get().getId())
-                .warehouseId(receipt.get().getWarehouse().getId())
-                .goodsId(receipt.get().getGoods().getId())
-                .quantity(receipt.get().getQuantity())
-                .totalPrice(receipt.get().getTotalPrice())
-                .supplier(receipt.get().getSuplier())
-                .date(receipt.get().getDate())
+                .id(receipt.getId())
+                .warehouseId(receipt.getWarehouse().getId())
+                .goodsId(receipt.getGoods().getId())
+                .quantity(receipt.getQuantity())
+                .totalPrice(receipt.getTotalPrice())
+                .supplier(receipt.getSuplier())
+                .date(receipt.getDate())
                 .build();
 
         return BaseResponse.builder()
@@ -78,6 +77,8 @@ public class ReceiptService {
 
     public BaseResponse getAllReceiptByWarehouseId(Long warehouseId) {
         List<Receipt> receipts = receiptRepository.findByWarehouseId(warehouseId);
+        if (receipts.isEmpty())
+            throw new NoContentException(String.format("No Receipt for Warehouse with ID %d", warehouseId));
 
         List<ReceiptResponse> data = new ArrayList<>();
         for (Receipt receipt : receipts) {
@@ -99,34 +100,19 @@ public class ReceiptService {
     }
 
     public BaseResponse saveReceipt(ReceiptRequest request) {
-        Optional<Warehouse> warehouse = warehouseRepository.findById(request.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Warehouse with ID " + request.getWarehouseId() + " not found")
-                    .build();
-        }
-        Optional<Goods> goods = goodsRepository.findById(request.getGoodsId());
-        if (goods.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Goods with ID " + request.getGoodsId() + " not found")
-                    .build();
-        }
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
+                .orElseThrow(() -> new NotFoundException(String.format("Warehouse with ID %d not found", request.getWarehouseId())));
+        Goods goods = goodsRepository.findById(request.getGoodsId()).
+                orElseThrow(() -> new NotFoundException(String.format("Goods with ID %d not found", request.getGoodsId())));
 
-        List<Stock> stockList = stockRepository.findByWarehouseIdAndGoodsId(request.getWarehouseId(), request.getGoodsId());
-
-//        Stock stock = Optional.ofNullable(stockList.get(0)).orElse(new Stock());
-        Stock stock = stockList.isEmpty() ? new Stock() : stockList.get(0);
-        stock.setWarehouse(warehouse.get());
-        stock.setGoods(goods.get());
-        stock.setQuantity(Optional.ofNullable(stock.getQuantity()).orElse(0L) + request.getQuantity());
-        stockRepository.save(stock);
+        stockService.addStock(warehouse, goods, request.getQuantity());
 
         Receipt receipt = new Receipt();
-        receipt.setWarehouse(warehouse.get());
-        receipt.setGoods(goods.get());
+        receipt.setWarehouse(warehouse);
+        receipt.setGoods(goods);
         receipt.setSuplier(request.getSuplier());
         receipt.setQuantity(request.getQuantity());
-        receipt.setTotalPrice(goods.get().getPurchasePrice().multiply(BigDecimal.valueOf(request.getQuantity())));
+        receipt.setTotalPrice(goods.getPurchasePrice().multiply(BigDecimal.valueOf(request.getQuantity())));
         receipt.setDate(new Date());
         Receipt savedReceipt = receiptRepository.save(receipt);
 

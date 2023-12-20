@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import whizware.whizware.entity.Stock;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {

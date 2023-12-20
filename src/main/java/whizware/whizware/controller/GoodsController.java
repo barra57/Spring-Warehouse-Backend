@@ -2,6 +2,7 @@ package whizware.whizware.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import whizware.whizware.dto.BaseResponse;
@@ -21,31 +22,26 @@ public class GoodsController {
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAllGods() {
-        BaseResponse responseGoods = goodsService.getAllGoods();
-        return ResponseEntity.ok(responseGoods);
+        return ResponseEntity.ok(goodsService.getAllGoods());
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse> saveGoods(@Valid @RequestBody GoodsRequest goodsRequest) {
-        BaseResponse baseResponse = goodsService.saveGoods(goodsRequest);
-        return ResponseEntity.ok(baseResponse);
+        return new ResponseEntity<>(goodsService.saveGoods(goodsRequest), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse> updateGoods(@PathVariable("id") Long id, @Valid @RequestBody GoodsRequest goodsRequest) {
-        BaseResponse baseResponse = goodsService.updateGoods(id, goodsRequest);
-        return ResponseEntity.ok(baseResponse);
+        return ResponseEntity.ok(goodsService.updateGoods(id, goodsRequest));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteGoods(@PathVariable("id") Long id) {
-        BaseResponse responseGoods = goodsService.deleteIdGoods(id);
-        return ResponseEntity.ok(responseGoods);
+        return ResponseEntity.ok(goodsService.deleteIdGoods(id));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getGoodsById(@PathVariable("id") Long id) {
-        BaseResponse baseResponse = goodsService.getGoodsById(id);
-        return ResponseEntity.ok(baseResponse);
+        return ResponseEntity.ok(goodsService.getGoodsById(id));
     }
 }

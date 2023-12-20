@@ -19,20 +19,17 @@ public class LocationController {
 
     @PostMapping
     public ResponseEntity<BaseResponse> addLoc(@Valid @RequestBody LocationRequest request) {
-        BaseResponse response = locationService.addLocation(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(locationService.addLocation(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse> updateLoc(@PathVariable("id") Long id, @Valid @RequestBody LocationRequest request) {
-        BaseResponse response = locationService.updateLocation(id, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(locationService.updateLocation(id, request));
     }
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAll() {
-        BaseResponse response = locationService.getAll();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(locationService.getAll());
     }
 
     @GetMapping("/{id}")
@@ -46,7 +43,6 @@ public class LocationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteLocation(@PathVariable("id") Long id) {
-        BaseResponse response = locationService.deleteLocation(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(locationService.deleteLocation(id));
     }
 }

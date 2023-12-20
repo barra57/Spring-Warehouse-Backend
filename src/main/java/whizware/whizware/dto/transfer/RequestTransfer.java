@@ -17,5 +17,5 @@ public class RequestTransfer {
 
     @NotNull(message = "Please enter Quantity")
     @Min(message = "Quantity must be above 0", value = 0L)
-    private Integer quantity;
+    private Long quantity;
 }

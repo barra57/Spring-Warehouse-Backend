@@ -13,7 +13,7 @@ public class ResponseTransfer {
     private Long warehouseId;
     private Long warehouseTargetId;
     private Long goodsId;
-    private Integer quantity;
+    private Long quantity;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date date;
 }

@@ -3,7 +3,6 @@ package whizware.whizware.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,30 +28,17 @@ public class ReceiptController {
         if (warehouseId == null) {
             return ResponseEntity.ok(receiptService.getAllReceipt());
         }
-
-        BaseResponse response = receiptService.getAllReceiptByWarehouseId(warehouseId);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(receiptService.getAllReceiptByWarehouseId(warehouseId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getById(@PathVariable Long id) {
-        BaseResponse response = receiptService.getReceiptById(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(receiptService.getReceiptById(id));
     }
 
     @PostMapping
     public ResponseEntity<BaseResponse> save(@Valid @RequestBody ReceiptRequest request) {
-        BaseResponse response = receiptService.saveReceipt(request);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(receiptService.saveReceipt(request), HttpStatus.CREATED);
     }
 
 }

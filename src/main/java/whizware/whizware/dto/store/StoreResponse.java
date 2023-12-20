@@ -9,6 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class StoreResponse {
     private Long id;
+    private Long locationId;
     private String name;
-    private Long loc_id;
 }

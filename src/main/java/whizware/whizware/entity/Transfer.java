@@ -20,7 +20,7 @@ public class Transfer {
     @ManyToOne
     private Goods goods;
 
-    private Integer quantity;
+    private Long quantity;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date date;
 }
