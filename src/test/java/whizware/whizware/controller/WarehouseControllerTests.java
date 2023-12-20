@@ -32,20 +32,14 @@ class WarehouseControllerTests {
     @Mock
     WarehouseService warehouseService;
 
-//    @BeforeEach
-//    void init() {
-//        MockitoAnnotations.openMocks(this);
-//    }
-
-
     @Test
     void getAllWarehouses() {
 
         List<WarehouseResponse> data = new ArrayList<>(
                 List.of(
-                        generateWarehouseResponse(1L, "asdf", 2L),
-                        generateWarehouseResponse(1L, "asdf", 2L),
-                        generateWarehouseResponse(1L, "asdf", 2L)
+                        generateWarehouseResponse(1L, "A", 2L),
+                        generateWarehouseResponse(2L, "B", 2L),
+                        generateWarehouseResponse(3L, "C", 2L)
                 )
         );
 

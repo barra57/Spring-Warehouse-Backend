@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,47 +21,17 @@ public class DeliveryController {
         if (warehouseId == null) {
             return ResponseEntity.ok(deliveryService.getAllDelivery());
         }
-
-        BaseResponse response = deliveryService.getAllDeliveryByWarehouseId(warehouseId);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(deliveryService.getAllDeliveryByWarehouseId(warehouseId));
     }
 
     @GetMapping("/{id}")
     public  ResponseEntity<BaseResponse> getDeliveryById(@PathVariable Long id) {
-        BaseResponse response = deliveryService.getDeliveryById(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(deliveryService.getDeliveryById(id));
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> saveDelivery(@RequestBody DeliveryRequest deliveryRequest) {
-        BaseResponse response = deliveryService.saveDelivery(deliveryRequest);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse> saveDelivery(@Valid @RequestBody DeliveryRequest deliveryRequest) {
+        return new ResponseEntity<>(deliveryService.saveDelivery(deliveryRequest), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updateDelivery(@PathVariable Long id, @RequestBody DeliveryRequest deliveryRequest) {
-        BaseResponse response = deliveryService.updateDelivery(id, deliveryRequest);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteDelivery(@PathVariable Long id) {
-        BaseResponse response = deliveryService.deleteDelivery(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
 }

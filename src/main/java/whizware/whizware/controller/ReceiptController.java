@@ -1,12 +1,11 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,57 +28,17 @@ public class ReceiptController {
         if (warehouseId == null) {
             return ResponseEntity.ok(receiptService.getAllReceipt());
         }
-
-        BaseResponse response = receiptService.getAllReceiptByWarehouseId(warehouseId);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(receiptService.getAllReceiptByWarehouseId(warehouseId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getById(@PathVariable Long id) {
-        BaseResponse response = receiptService.getReceiptById(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(receiptService.getReceiptById(id));
     }
-
-//    @GetMapping
-//    public ResponseEntity<BaseResponse> getByWarehouseId(@RequestParam("warehouse_id") Long warehouseId) {
-//        BaseResponse response = receiptService.getAllReceiptByWarehouseId(warehouseId);
-//        if (response.getData() == null) {
-//            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-//        }
-//        return ResponseEntity.ok(response);
-//    }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> save(@RequestBody ReceiptRequest request) {
-        BaseResponse response = receiptService.saveReceipt(request);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> update(@PathVariable Long id, @RequestBody ReceiptRequest request) {
-        BaseResponse response = receiptService.updateReceipt(id, request);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> update(@PathVariable Long id) {
-        BaseResponse response = receiptService.deleteReceipt(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse> save(@Valid @RequestBody ReceiptRequest request) {
+        return new ResponseEntity<>(receiptService.saveReceipt(request), HttpStatus.CREATED);
     }
 
 }

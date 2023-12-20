@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 @Data
 @Builder
@@ -15,9 +15,8 @@ public class DeliveryResponse {
     private Long warehouseId;
     private Long storeId;
     private Long goodsId;
-    private Long qty;
+    private Long quantity;
     private BigDecimal totalPrice;
-    private String status;
     @JsonFormat(pattern = "DD-MM-yyyy")
     private Date date;
 }

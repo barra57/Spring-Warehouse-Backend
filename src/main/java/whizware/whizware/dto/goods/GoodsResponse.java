@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @Builder
 public class GoodsResponse {
     private Long id;
     private String name;
-    private Long sellingPrice;
-    private Long purchasePrice;
+    private BigDecimal sellingPrice;
+    private BigDecimal purchasePrice;
     private String description;
 }

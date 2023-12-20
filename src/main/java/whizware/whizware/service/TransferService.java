@@ -6,9 +6,13 @@ import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.transfer.RequestTransfer;
 import whizware.whizware.dto.transfer.ResponseTransfer;
 import whizware.whizware.entity.Goods;
+import whizware.whizware.entity.Stock;
 import whizware.whizware.entity.Transfer;
 import whizware.whizware.entity.Warehouse;
+import whizware.whizware.exception.NoContentException;
+import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.GoodsRepository;
+import whizware.whizware.repository.StockRepository;
 import whizware.whizware.repository.TransferRepository;
 import whizware.whizware.repository.WarehouseRepository;
 
@@ -20,132 +24,45 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TransferService {
+    private final StockService stockService;
 
     private final TransferRepository transferRepository;
-
     private final WarehouseRepository warehouseRepository;
-
     private final GoodsRepository goodsRepository;
 
-    public BaseResponse addTransfer(RequestTransfer request) {
-        Transfer transfer = new Transfer();
+    public BaseResponse getAll() {
+        List<Transfer> transfers = transferRepository.findAll();
+        if (transfers.isEmpty())
+            throw new NoContentException("Transfer is empty");
 
-        Optional<Warehouse> optWH = warehouseRepository.findById(request.getWarehouse_id());
-        Optional<Warehouse> optWHTarget = warehouseRepository.findById(request.getWarehouse_target_id());
-        Optional<Goods> optGoods = goodsRepository.findById(request.getGoods_id());
-
-        transfer.setQuantity(request.getQuantity());
-        transfer.setDate(new Date());
-        transfer.setStatus(request.getStatus());
-        transfer.setWarehouse(optWH.get());
-        transfer.setWarehouse_target(optWHTarget.get());
-        transfer.setGoods(optGoods.get());
-        transferRepository.save(transfer);
-
-        ResponseTransfer data = ResponseTransfer.builder()
-                .id(transfer.getId())
-                .date(new Date())
-                .quantity(transfer.getQuantity())
-                .status(transfer.getStatus())
-                .warehouse_id(transfer.getWarehouse().getId())
-                .warehouse_target_id(transfer.getWarehouse_target().getId())
-                .goods_id(transfer.getGoods().getId())
-                .build();
+        List<ResponseTransfer> data = new ArrayList<>();
+        for (Transfer transfer : transfers) {
+            data.add(ResponseTransfer.builder()
+                    .id(transfer.getId())
+                    .date(new Date())
+                    .quantity(transfer.getQuantity())
+                    .warehouseId(transfer.getWarehouse().getId())
+                    .warehouseTargetId(transfer.getWarehouseTarget().getId())
+                    .goodsId(transfer.getGoods().getId())
+                    .build());
+        }
 
         return BaseResponse.builder()
-                .message("Success add data!")
+                .message("Success get all transfer data!")
                 .data(data)
                 .build();
     }
 
-    public BaseResponse updateTransfer(Long id, RequestTransfer request) {
-        Optional<Transfer> optTransfer = transferRepository.findById(id);
-
-        Optional<Warehouse> optWH = warehouseRepository.findById(request.getWarehouse_id());
-        Optional<Warehouse> optWHTarget = warehouseRepository.findById(request.getWarehouse_target_id());
-        Optional<Goods> optGoods = goodsRepository.findById(request.getGoods_id());
-
-        Transfer transfer = new Transfer();
-
-        if (optTransfer.isPresent()) {
-            transfer.setQuantity(request.getQuantity());
-            transfer.setStatus(request.getStatus());
-            transfer.setWarehouse(optWH.get());
-            transfer.setWarehouse_target(optWHTarget.get());
-            transfer.setGoods(optGoods.get());
-            transferRepository.save(transfer);
-
-            ResponseTransfer data = ResponseTransfer.builder()
-                    .id(id)
-                    .date(new Date())
-                    .quantity(transfer.getQuantity())
-                    .status(transfer.getStatus())
-                    .warehouse_id(transfer.getWarehouse().getId())
-                    .warehouse_target_id(transfer.getWarehouse_target().getId())
-                    .goods_id(transfer.getGoods().getId())
-                    .build();
-
-            return BaseResponse.builder()
-                    .message("Success update data!")
-                    .data(data)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Failed update data!")
-                    .data(null)
-                    .build();
-        }
-    }
-
-    public BaseResponse getAll() {
-
-        List<Transfer> transfers = transferRepository.findAll();
-        List<ResponseTransfer> data = new ArrayList<>();
-
-        for (Transfer transfer: transfers) {
-            data.add(ResponseTransfer.builder()
-                            .id(transfer.getId())
-                            .date(new Date())
-                            .quantity(transfer.getQuantity())
-                            .status(transfer.getStatus())
-                            .warehouse_id(transfer.getWarehouse().getId())
-                            .warehouse_target_id(transfer.getWarehouse_target().getId())
-                            .goods_id(transfer.getGoods().getId())
-                            .build());
-        }
-
-        if (data.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Failed get all transfer data!")
-                    .data(null)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Success get all transfer data!")
-                    .data(data)
-                    .build();
-        }
-    }
-
     public BaseResponse getTransferById(Long id) {
-
-        Optional<Transfer> transfer = transferRepository.findById(id);
-
-        if (transfer.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Failed get transfer data with ID " + id)
-                    .data(null)
-                    .build();
-        }
+        Transfer transfer = transferRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Transfer with ID %d not found", id)));
 
         ResponseTransfer data = ResponseTransfer.builder()
                 .id(id)
-                .quantity(transfer.get().getQuantity())
-                .status(transfer.get().getStatus())
+                .quantity(transfer.getQuantity())
                 .date(new Date())
-                .warehouse_id(transfer.get().getWarehouse().getId())
-                .warehouse_target_id(transfer.get().getWarehouse_target().getId())
-                .goods_id(transfer.get().getGoods().getId())
+                .warehouseId(transfer.getWarehouse().getId())
+                .warehouseTargetId(transfer.getWarehouseTarget().getId())
+                .goodsId(transfer.getGoods().getId())
                 .build();
 
         return BaseResponse.builder()
@@ -154,21 +71,35 @@ public class TransferService {
                 .build();
     }
 
-    public BaseResponse deleteTransfer(Long id) {
-        Optional<Transfer> data = transferRepository.findById(id);
+    public BaseResponse addTransfer(RequestTransfer request) {
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId()).orElseThrow(() -> new NotFoundException(String.format("Warehouse with ID %d not found", request.getWarehouseId())));
+        Warehouse warehouseTarget = warehouseRepository.findById(request.getWarehouseTargetId()).orElseThrow(() -> new NotFoundException(String.format("Warehouse Target with ID %d not found", request.getWarehouseId())));
+        Goods goods = goodsRepository.findById(request.getGoodsId()).orElseThrow(() -> new NotFoundException(String.format("Goods with ID %d not found", request.getGoodsId())));
 
-        if (data.isEmpty()){
-            return BaseResponse.builder()
-                    .message("Failed delete transfer data with ID " + id)
-                    .data(null)
-                    .build();
-        }
+        stockService.subtractStock(warehouse, goods, request.getQuantity());
+        stockService.addStock(warehouseTarget, goods, request.getQuantity());
 
-        transferRepository.deleteById(id);
+        Transfer transfer = new Transfer();
+        transfer.setWarehouse(warehouse);
+        transfer.setWarehouseTarget(warehouseTarget);
+        transfer.setQuantity(request.getQuantity());
+        transfer.setGoods(goods);
+        transfer.setDate(new Date());
+
+        Transfer savedTransfer = transferRepository.save(transfer);
 
         return BaseResponse.builder()
-                .message("Succes delete transfer data with ID " + id)
-                .data(data)
+                .message("Transfer success")
+                .data(ResponseTransfer.builder()
+                        .id(savedTransfer.getId())
+                        .warehouseId(savedTransfer.getWarehouse().getId())
+                        .warehouseTargetId(savedTransfer.getWarehouseTarget().getId())
+                        .goodsId(savedTransfer.getGoods().getId())
+                        .quantity(savedTransfer.getQuantity())
+                        .date(savedTransfer.getDate())
+                        .build())
                 .build();
+
     }
+
 }

@@ -10,11 +10,10 @@ import java.util.Date;
 @Builder
 public class ResponseTransfer {
     private Long id;
-    private Integer quantity;
-    private String status;
+    private Long warehouseId;
+    private Long warehouseTargetId;
+    private Long goodsId;
+    private Long quantity;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date date;
-    private Long warehouse_id;
-    private Long warehouse_target_id;
-    private Long goods_id;
 }

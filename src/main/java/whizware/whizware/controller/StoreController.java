@@ -17,32 +17,27 @@ public class StoreController {
 
     @PostMapping
     public ResponseEntity<BaseResponse> addStore(@RequestBody StoreRequest request) {
-        BaseResponse response = storeService.addStore(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(storeService.addStore(request), HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<BaseResponse> getAllStore() {
-        BaseResponse response = storeService.getAll();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(storeService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getStoreById(@PathVariable("id") Long id) {
-        BaseResponse response = storeService.getStoreById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(storeService.getStoreById(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteStoreById(@PathVariable("id") Long id) {
-        BaseResponse response = storeService.deleteStoreById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(storeService.deleteStoreById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse> updateStore(@PathVariable("id") Long id, @RequestBody StoreRequest request) {
-        BaseResponse response = storeService.updateStore(id, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(storeService.updateStore(id, request));
     }
 
 }

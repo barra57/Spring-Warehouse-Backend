@@ -1,18 +1,22 @@
 package whizware.whizware.dto.receipt;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class ReceiptRequest {
+    @NotNull(message = "Please enter Warehouse ID")
     private Long warehouseId;
+
+    @NotNull(message = "Please enter Goods ID")
     private Long goodsId;
+
+    @NotNull(message = "Please enter Quantity")
+    @Min(message = "Quantity must be above 0", value = 0L)
     private Long quantity;
-    private BigDecimal totalPrice;
+    
+    @NotBlank(message = "Please enter Suplier")
     private String suplier;
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date date;
 }

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class StoreRequest {
-    private Long loc_id;
+    private Long locationId;
     private String name;
 }

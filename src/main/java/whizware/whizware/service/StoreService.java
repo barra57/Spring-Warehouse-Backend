@@ -7,6 +7,7 @@ import whizware.whizware.dto.store.StoreRequest;
 import whizware.whizware.dto.store.StoreResponse;
 import whizware.whizware.entity.Location;
 import whizware.whizware.entity.Store;
+import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.LocationRepository;
 import whizware.whizware.repository.StoreRepository;
 
@@ -25,7 +26,7 @@ public class StoreService {
     public BaseResponse addStore(StoreRequest request) {
         Store store = new Store();
 
-        Optional<Location> optLoc = locationRepository.findById(request.getLoc_id());
+        Optional<Location> optLoc = locationRepository.findById(request.getLocationId());
 
         if (optLoc.isPresent()) {
             store.setName(request.getName());
@@ -35,7 +36,7 @@ public class StoreService {
             StoreResponse data = StoreResponse.builder()
                     .id(store.getId())
                     .name(store.getName())
-                    .loc_id(store.getLocation().getId())
+                    .locationId(store.getLocation().getId())
                     .build();
 
             return BaseResponse.builder()
@@ -52,33 +53,26 @@ public class StoreService {
 
     public BaseResponse updateStore(Long id, StoreRequest request) {
 
-        Optional<Store> optStore = storeRepository.findById(id);
-        Optional<Location> optLoc = locationRepository.findById(request.getLoc_id());
+        Store optStore = storeRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Store with ID %d not found", id)));
+        Location optLoc = locationRepository.findById(request.getLocationId()).orElseThrow(() -> new NotFoundException(String.format("Location with ID %d not found", request.getLocationId())));
 
         Store store = new Store();
 
-        if (optStore.isPresent() && optLoc.isPresent()) {
-            store.setId(optStore.get().getId());
-            store.setName(request.getName());
-            store.setLocation(optLoc.get());
-            storeRepository.save(store);
+        store.setId(optStore.getId());
+        store.setName(request.getName());
+        store.setLocation(optLoc);
+        storeRepository.save(store);
 
-            StoreResponse data = StoreResponse.builder()
-                    .id(id)
-                    .name(store.getName())
-                    .loc_id(store.getLocation().getId())
-                    .build();
+        StoreResponse data = StoreResponse.builder()
+                .id(id)
+                .name(store.getName())
+                .locationId(store.getLocation().getId())
+                .build();
 
-            return BaseResponse.builder()
-                    .message("Success update data!")
-                    .data(data)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Cannot update data!")
-                    .data(null)
-                    .build();
-        }
+        return BaseResponse.builder()
+                .message("Success update data!")
+                .data(data)
+                .build();
     }
 
     public BaseResponse getAll() {
@@ -87,15 +81,15 @@ public class StoreService {
 
         List<StoreResponse> data = new ArrayList<>();
 
-        for (Store store: stores) {
+        for (Store store : stores) {
             data.add(StoreResponse.builder()
                     .id(store.getId())
                     .name(store.getName())
-                    .loc_id(store.getLocation().getId())
+                    .locationId(store.getLocation().getId())
                     .build());
         }
 
-        if (data.isEmpty()){
+        if (data.isEmpty()) {
             return BaseResponse.builder()
                     .message("Failed get all store data!!")
                     .data(null)

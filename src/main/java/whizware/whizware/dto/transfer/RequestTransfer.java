@@ -1,17 +1,21 @@
 package whizware.whizware.dto.transfer;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 public class RequestTransfer {
-    private Integer quantity;
-    private String status;
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date date;
-    private Long warehouse_id;
-    private Long warehouse_target_id;
-    private Long goods_id;
+    @NotNull(message = "Please enter Warehouse ID")
+    private Long warehouseId;
+
+    @NotNull(message = "Please enter Warehouse Target ID")
+    private Long warehouseTargetId;
+
+    @NotNull(message = "Please enter Goods ID")
+    private Long goodsId;
+
+    @NotNull(message = "Please enter Quantity")
+    @Min(message = "Quantity must be above 0", value = 0L)
+    private Long quantity;
 }

@@ -1,5 +1,6 @@
 package whizware.whizware.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,38 +23,22 @@ public class WarehouseController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getById(@PathVariable Long id) {
-        BaseResponse response = warehouseService.getWarehouseById(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(warehouseService.getWarehouseById(id));
     }
 
     @PostMapping
-    public ResponseEntity<BaseResponse> save(@RequestBody WarehouseRequest request) {
-        BaseResponse response = warehouseService.saveWarehouse(request);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<BaseResponse> save(@Valid @RequestBody WarehouseRequest request) {
+        return new ResponseEntity<>(warehouseService.saveWarehouse(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse> updated(@PathVariable Long id, @RequestBody WarehouseRequest request) {
-        BaseResponse response = warehouseService.updateWarehouse(id, request);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse> updated(@PathVariable Long id, @Valid @RequestBody WarehouseRequest request) {
+        return ResponseEntity.ok(warehouseService.updateWarehouse(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> delete(@PathVariable Long id) {
-        BaseResponse response = warehouseService.deleteWarehouse(id);
-        if (response.getData() == null) {
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(warehouseService.deleteWarehouse(id));
     }
 
 }
