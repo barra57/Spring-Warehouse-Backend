@@ -37,6 +37,9 @@ public class LocationController {
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getById(@PathVariable("id") Long id){
         BaseResponse response = locationService.getLocById(id);
+        if (response.getData() == null) {
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
         return ResponseEntity.ok(response);
     }
 

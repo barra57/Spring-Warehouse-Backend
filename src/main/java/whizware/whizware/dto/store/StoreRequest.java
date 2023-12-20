@@ -1,10 +1,11 @@
 package whizware.whizware.dto.store;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class StoreRequest {
-    private Long id;
     private Long loc_id;
     private String name;
 }
