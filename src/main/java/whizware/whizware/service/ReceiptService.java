@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -14,13 +13,11 @@ import whizware.whizware.dto.receipt.ReceiptRequest;
 import whizware.whizware.dto.receipt.ReceiptResponse;
 import whizware.whizware.entity.Goods;
 import whizware.whizware.entity.Receipt;
-import whizware.whizware.entity.Stock;
 import whizware.whizware.entity.Warehouse;
 import whizware.whizware.exception.NoContentException;
 import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.GoodsRepository;
 import whizware.whizware.repository.ReceiptRepository;
-import whizware.whizware.repository.StockRepository;
 import whizware.whizware.repository.WarehouseRepository;
 
 @Service

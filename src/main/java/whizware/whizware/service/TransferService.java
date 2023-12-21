@@ -6,20 +6,17 @@ import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.transfer.RequestTransfer;
 import whizware.whizware.dto.transfer.ResponseTransfer;
 import whizware.whizware.entity.Goods;
-import whizware.whizware.entity.Stock;
 import whizware.whizware.entity.Transfer;
 import whizware.whizware.entity.Warehouse;
 import whizware.whizware.exception.NoContentException;
 import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.GoodsRepository;
-import whizware.whizware.repository.StockRepository;
 import whizware.whizware.repository.TransferRepository;
 import whizware.whizware.repository.WarehouseRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
