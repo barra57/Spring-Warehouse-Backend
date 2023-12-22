@@ -77,4 +77,22 @@ public class StockService {
         stockRepository.save(stock);
     }
 
+    public BaseResponse getStockByWarehouseId(Long id) {
+        List<Stock> stock = stockRepository.findByWarehouseId(id);
+        if (stock.isEmpty())
+            throw new NoContentException("Stock is empty");
+        List<StockResponse> data = new ArrayList<>();
+        for (Stock s : stock) {
+            data.add(StockResponse.builder()
+                    .id(s.getId())
+                    .warehouseId(s.getWarehouse().getId())
+                    .goodsId(s.getGoods().getId())
+                    .quantity(s.getQuantity())
+                    .build());
+        }
+        return BaseResponse.builder()
+                .message("Success")
+                .data(data)
+                .build();
+    }
 }

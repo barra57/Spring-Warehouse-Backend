@@ -154,5 +154,38 @@ class StockServiceTests {
         Assertions.assertDoesNotThrow(() -> stockService.addStock(warehouse, goods1, 5L));
     }
 
+    @Test
+    void testGetStockByWarehouseId() {
+        List<Stock> mockData = new ArrayList<>();
+        mockData.add(stock1);
+
+        String expectedMessage = "Success";
+        List<StockResponse> expectedData = new ArrayList<>();
+        expectedData.add(stockResponse1);
+
+        BaseResponse expectedResponse = BaseResponse.builder()
+                .message(expectedMessage)
+                .data(expectedData)
+                .build();
+        when(stockRepository.findByWarehouseId(warehouse.getId())).thenReturn(mockData);
+
+        BaseResponse actualResponse = stockService.getStockByWarehouseId(warehouse.getId());
+        List<StockResponse> actualData = (List<StockResponse>) actualResponse.getData();
+
+        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        Assertions.assertEquals(expectedData.size(), actualData.size());
+        Assertions.assertEquals(expectedData.get(0).getId(), actualData.get(0).getId());
+        Assertions.assertEquals(expectedData.get(0).getWarehouseId(), actualData.get(0).getWarehouseId());
+        Assertions.assertEquals(expectedData.get(0).getGoodsId(), actualData.get(0).getGoodsId());
+        Assertions.assertEquals(expectedData.get(0).getQuantity(), actualData.get(0).getQuantity());
+    }
+
+    @Test
+    void testGetStockByWarehouseIdWithEmptyList() {
+        Long id = warehouse.getId();
+        List<Stock> mockData = new ArrayList<>();
+        when(stockRepository.findByWarehouseId(warehouse.getId())).thenReturn(mockData);
+        Assertions.assertThrows(NoContentException.class, () -> stockService.getStockByWarehouseId(id));
+    }
 
 }

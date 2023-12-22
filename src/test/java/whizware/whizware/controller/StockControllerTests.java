@@ -47,7 +47,7 @@ class StockControllerTests {
     void setUp() {
         this.warehouse = new Warehouse(1L, "admin", new Location(1L, "Jakarta"));
 
-        this.goods1 = new Goods(1L, "Laptop" , new BigDecimal(1000000L), new BigDecimal(2000000L), "Barang Elektronik");
+        this.goods1 = new Goods(1L, "Laptop", new BigDecimal(1000000L), new BigDecimal(2000000L), "Barang Elektronik");
         this.goods2 = new Goods(2L, "Monitor", new BigDecimal(3000000L), new BigDecimal(4000000L), "Barang Elektronik");
 
         this.stock1 = new Stock(1L, warehouse, goods1, 5L);
@@ -95,6 +95,25 @@ class StockControllerTests {
 
         Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());
+        Assertions.assertNotNull(actualResponse.getBody().getData());
+    }
+
+    @Test
+    void getStockByWarehouseId() {
+
+        List<StockResponse> data = new ArrayList<>();
+        data.add(stockResponse1);
+
+        BaseResponse expectedResponse = BaseResponse.builder()
+                .message("Success")
+                .data(data)
+                .build();
+        when(stockService.getStockByWarehouseId(warehouse.getId())).thenReturn(expectedResponse);
+
+        ResponseEntity<BaseResponse> actualResponse = stockController.getStockByWarehouseId(warehouse.getId());
+
+        Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        Assertions.assertEquals("Success", actualResponse.getBody().getMessage());
         Assertions.assertNotNull(actualResponse.getBody().getData());
     }
 

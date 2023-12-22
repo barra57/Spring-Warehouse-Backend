@@ -22,4 +22,9 @@ public class StockController {
     public ResponseEntity<BaseResponse> getStockById(@PathVariable Long id) {
         return ResponseEntity.ok(stockService.getStockById(id));
     }
+
+    @GetMapping("/warehouse/{id}")
+    public ResponseEntity<BaseResponse> getStockByWarehouseId(@PathVariable Long id) {
+        return ResponseEntity.ok(stockService.getStockByWarehouseId(id));
+    }
 }

@@ -10,4 +10,6 @@ import java.util.List;
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
     List<Stock> findByWarehouseIdAndGoodsId(Long warehouseId, Long goodsId);
+
+    List<Stock> findByWarehouseId(Long id);
 }
