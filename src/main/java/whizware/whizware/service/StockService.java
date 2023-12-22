@@ -3,7 +3,6 @@ package whizware.whizware.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import whizware.whizware.dto.BaseResponse;
-import whizware.whizware.dto.stock.StockRequest;
 import whizware.whizware.dto.stock.StockResponse;
 import whizware.whizware.entity.Goods;
 import whizware.whizware.entity.Stock;
@@ -11,9 +10,7 @@ import whizware.whizware.entity.Warehouse;
 import whizware.whizware.exception.ConflictException;
 import whizware.whizware.exception.NoContentException;
 import whizware.whizware.exception.NotFoundException;
-import whizware.whizware.repository.GoodsRepository;
 import whizware.whizware.repository.StockRepository;
-import whizware.whizware.repository.WarehouseRepository;
 
 import java.util.ArrayList;
 import java.util.List;

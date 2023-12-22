@@ -65,6 +65,23 @@
             <version>0.8.8</version>
             <scope>test</scope>
         </dependency>
+        <!-- JwtToken -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <!-- JwtToken -->
     </dependencies>
 
     <build>
@@ -97,10 +114,16 @@
                     <excludes>
                         <exclude>**/repository/*</exclude>
                         <exclude>**/entity/*</exclude>
-                        <exclude>**/dto/*</exclude>
+                        <exclude>**/dto/**</exclude>
                         <exclude>**/interceptor/*</exclude>
                         <exclude>**/util/*</exclude>
                         <exclude>**/configuration/*</exclude>
+                        <exclude>**/advice/*</exclude>
+                        <exclude>**/exception/*</exclude>
+                        <exclude>**/filter/*</exclude>
+                        <exclude>**/constant/*</exclude>
+                        <exclude>**/service/JwtService*</exclude>
+                        <exclude>**/service/ExceptionService*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

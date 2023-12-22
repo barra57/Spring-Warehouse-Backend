@@ -7,6 +7,7 @@ import whizware.whizware.dto.store.StoreRequest;
 import whizware.whizware.dto.store.StoreResponse;
 import whizware.whizware.entity.Location;
 import whizware.whizware.entity.Store;
+import whizware.whizware.exception.NoContentException;
 import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.LocationRepository;
 import whizware.whizware.repository.StoreRepository;
@@ -23,38 +24,34 @@ public class StoreService {
 
     private final LocationRepository locationRepository;
 
+    private static final String STORE_NOT_FOUND_MESSEGE = "Store with ID %d not found";
+    private static final String LOCATION_NOT_FOUND_MESSEGE = "Location with ID %d not found";
+
     public BaseResponse addStore(StoreRequest request) {
         Store store = new Store();
 
-        Optional<Location> optLoc = locationRepository.findById(request.getLocationId());
+        Location location = locationRepository.findById(request.getLocationId()).orElseThrow(() -> new NotFoundException(String.format(LOCATION_NOT_FOUND_MESSEGE, request.getLocationId())));
 
-        if (optLoc.isPresent()) {
-            store.setName(request.getName());
-            store.setLocation(optLoc.get());
-            storeRepository.save(store);
+        store.setName(request.getName());
+        store.setLocation(location);
+        storeRepository.save(store);
 
-            StoreResponse data = StoreResponse.builder()
-                    .id(store.getId())
-                    .name(store.getName())
-                    .locationId(store.getLocation().getId())
-                    .build();
+        StoreResponse data = StoreResponse.builder()
+                .id(store.getId())
+                .name(store.getName())
+                .locationId(store.getLocation().getId())
+                .build();
 
-            return BaseResponse.builder()
-                    .message("Success add new store!!")
-                    .data(data)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Failed added store data!!")
-                    .data(null)
-                    .build();
-        }
+        return BaseResponse.builder()
+                .message("Success add new store!!")
+                .data(data)
+                .build();
     }
 
     public BaseResponse updateStore(Long id, StoreRequest request) {
 
-        Store optStore = storeRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Store with ID %d not found", id)));
-        Location optLoc = locationRepository.findById(request.getLocationId()).orElseThrow(() -> new NotFoundException(String.format("Location with ID %d not found", request.getLocationId())));
+        Store optStore = storeRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format(STORE_NOT_FOUND_MESSEGE, id)));
+        Location optLoc = locationRepository.findById(request.getLocationId()).orElseThrow(() -> new NotFoundException(String.format(LOCATION_NOT_FOUND_MESSEGE, request.getLocationId())));
 
         Store store = new Store();
 
@@ -90,10 +87,7 @@ public class StoreService {
         }
 
         if (data.isEmpty()) {
-            return BaseResponse.builder()
-                    .message("Failed get all store data!!")
-                    .data(null)
-                    .build();
+            throw new NoContentException("Store is empty");
         } else {
             return BaseResponse.builder()
                     .message("Success get all store data!")
@@ -112,10 +106,7 @@ public class StoreService {
                     .data(data)
                     .build();
         } else {
-            return BaseResponse.builder()
-                    .message("Failed get store with ID " + id)
-                    .data(null)
-                    .build();
+            throw new NotFoundException(String.format(STORE_NOT_FOUND_MESSEGE, id));
         }
     }
 
@@ -126,14 +117,11 @@ public class StoreService {
             storeRepository.deleteById(id);
 
             return BaseResponse.builder()
-                    .message("Success delete data with ID " + id)
+                    .message("Success delete store with ID " + id)
                     .data(null)
                     .build();
         } else {
-            return BaseResponse.builder()
-                    .message("Failed delete store data!")
-                    .data(null)
-                    .build();
+            throw new NotFoundException(String.format(STORE_NOT_FOUND_MESSEGE, id));
         }
     }
 }

@@ -10,12 +10,15 @@ import whizware.whizware.dto.BaseResponse;
 import whizware.whizware.dto.location.LocationRequest;
 import whizware.whizware.dto.location.LocationResponse;
 import whizware.whizware.entity.Location;
+import whizware.whizware.exception.NotFoundException;
+import whizware.whizware.exception.NoContentException;
 import whizware.whizware.repository.LocationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static whizware.whizware.util.TestUtilities.generateLocation;
 
@@ -48,7 +51,7 @@ class LocationServiceTest {
                 .build();
 
         BaseResponse response = BaseResponse.builder()
-                .message("Successfully added data!")
+                .message("Location successfully added")
                 .data(data)
                 .build();
 
@@ -56,9 +59,9 @@ class LocationServiceTest {
         BaseResponse actualResponse = locationService.addLocation(request);
         LocationResponse actualData = (LocationResponse) actualResponse.getData();
 
-        Assertions.assertEquals(response.getMessage(), actualResponse.getMessage());
+        assertEquals(response.getMessage(), actualResponse.getMessage());
         // Assertions.assertEquals(data.getId(), actualData.getId());
-        Assertions.assertEquals(data.getName(), actualData.getName());
+        assertEquals(data.getName(), actualData.getName());
     }
 
     @Test
@@ -90,9 +93,9 @@ class LocationServiceTest {
         BaseResponse actualResponse = locationService.updateLocation(id, request);
         LocationResponse actualData = (LocationResponse) actualResponse.getData();
 
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        assertEquals(expectedData.getId(), actualData.getId());
+        assertEquals(expectedData.getName(), actualData.getName());
     }
 
     @Test
@@ -101,15 +104,14 @@ class LocationServiceTest {
         LocationRequest request = new LocationRequest("Bali");
 
         BaseResponse expectedResponse = BaseResponse.builder()
-                .message("Fail update data with ID " + id)
+                .message(String.format("Location with ID %d not found", id))
                 .data(null)
                 .build();
         when(locationRepository.findById(id)).thenReturn(Optional.empty());
 
-        BaseResponse actualResponse = locationService.updateLocation(id, request);
+        NotFoundException actualResponse = assertThrows(NotFoundException.class, () -> locationService.updateLocation(id, request));
 
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
     }
 
     @Test
@@ -138,8 +140,18 @@ class LocationServiceTest {
         BaseResponse actualResponse = locationService.getAll();
         List<LocationResponse> actualData = (List<LocationResponse>) actualResponse.getData();
 
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.size(), actualData.size());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        assertEquals(expectedData.size(), actualData.size());
+    }
+
+    @Test
+    void getAllLocationInvalidTest() {
+        List<Location> locations = new ArrayList<>();
+        String message = "Location is empty";
+        when(locationRepository.findAll()).thenReturn(locations);
+
+        NoContentException exception = assertThrows(NoContentException.class, () -> locationService.getAll());
+        assertEquals(exception.getMessage(), message);
     }
 
     @Test
@@ -147,24 +159,34 @@ class LocationServiceTest {
         Long id = 1L;
         Location mockData = generateLocation(id, "Tangerang");
 
-        LocationResponse expectedData = LocationResponse.builder()
-                .id(mockData.getId())
-                .name(mockData.getName())
-                .build();
-
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message("Success get location with ID " + id + "!")
-                .data(expectedData)
+                .data(mockData)
                 .build();
 
         when(locationRepository.findById(id)).thenReturn(Optional.of(mockData));
 
         BaseResponse actualResponse = locationService.getLocById(id);
-        LocationResponse actualData = (LocationResponse) actualResponse.getData();
+        assertNotNull(actualResponse.getData());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        assertEquals(mockData, actualResponse.getData());
+    }
 
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
+    @Test
+    void getLocationWithInvalidIDTest() {
+        Long id = 1L;
+        Location mockData = generateLocation(id, "Tangerang");
+
+        BaseResponse expectedResponse = BaseResponse.builder()
+                .message(String.format("Location with ID %d not found", id))
+                .data(null)
+                .build();
+
+        when(locationRepository.findById(id)).thenReturn(Optional.empty());
+
+        NotFoundException actualResponse = assertThrows(NotFoundException.class, () -> locationService.getLocById(id));
+
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
     }
 
     @Test
@@ -179,16 +201,30 @@ class LocationServiceTest {
 
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message("Success delete data with ID " + id)
-                .data(expectedData)
+                .data(null)
                 .build();
         when(locationRepository.findById(id)).thenReturn(Optional.of(mockData));
 
         BaseResponse actualResponse = locationService.deleteLocation(id);
-        Location actualData = (Location) actualResponse.getData();
+//        Location actualData = (Location) actualResponse.getData();
+        assertNull(actualResponse.getData());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+    }
 
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
+    @Test
+    void deleteLocationWithInvalidIdTest() {
+        Long id = 1L;
+        Location mockData = generateLocation(id, "Jakarta");
+
+        BaseResponse expectedResponse = BaseResponse.builder()
+                .message(String.format("Location with ID %d not found", id))
+                .data(null)
+                .build();
+        when(locationRepository.findById(id)).thenReturn(Optional.empty());
+
+        NotFoundException actualResponse = assertThrows(NotFoundException.class, () -> locationService.deleteLocation(id));
+//        Location actualData = (Location) actualResponse.getData();
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
     }
 
 }

@@ -69,9 +69,9 @@ public class TestUtilities {
         request.setWarehouseId(warehouseId);
         request.setGoodsId(goodsId);
         request.setQuantity(quantity);
-        request.setTotalPrice(totalPrice);
+//        request.setTotalPrice(totalPrice);
         request.setSuplier(supplier);
-        request.setDate(date);
+//        request.setDate(date);
         return request;
     }
 
@@ -106,8 +106,8 @@ public class TestUtilities {
         goods.setId(id);
         goods.setName(name);
         goods.setDescription(description);
-        goods.setPurchasePrice(purchasePrice);
-        goods.setSellingPrice(sellingPrice);
+//        goods.setPurchasePrice(purchasePrice);
+//        goods.setSellingPrice(sellingPrice);
         return goods;
     }
 
