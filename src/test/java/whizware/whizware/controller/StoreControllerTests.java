@@ -6,57 +6,55 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import whizware.whizware.dto.BaseResponse;
-import whizware.whizware.dto.warehouse.WarehouseRequest;
-import whizware.whizware.dto.warehouse.WarehouseResponse;
+import whizware.whizware.dto.store.StoreRequest;
+import whizware.whizware.dto.store.StoreResponse;
 import whizware.whizware.entity.Location;
-import whizware.whizware.entity.Warehouse;
-import whizware.whizware.service.WarehouseService;
+import whizware.whizware.entity.Store;
+import whizware.whizware.service.StoreService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static whizware.whizware.util.TestUtilities.*;
 
 @ExtendWith(MockitoExtension.class)
-class WarehouseControllerTests {
+class StoreControllerTests {
 
     @InjectMocks
-    WarehouseController warehouseController;
+    StoreController storeController;
 
     @Mock
-    WarehouseService warehouseService;
+    StoreService storeService;
 
-    private Warehouse warehouse1;
-    private Warehouse warehouse2;
+    private Store store1;
+    private Store store2;
 
-    private WarehouseResponse warehouseResponse1;
-    private WarehouseResponse warehouseResponse2;
+    private StoreResponse storeResponse1;
+    private StoreResponse storeResponse2;
 
-    private WarehouseRequest warehouseRequest;
+    private StoreRequest storeRequest;
 
     @BeforeEach
     void setUp() {
-        this.warehouse1 = new Warehouse(1L, "A", new Location(1L, "Jakarta"));
-        this.warehouse2 = new Warehouse(2L, "B", new Location(2L, "Bekasi"));
+        this.store1 = new Store(1L, "A", new Location(1L, "Jakarta"));
+        this.store2 = new Store(2L, "B", new Location(2L, "Bekasi"));
 
-        this.warehouseRequest = new WarehouseRequest("A", 1L);
+        this.storeRequest = new StoreRequest(1l, "A");
 
-        this.warehouseResponse1 = new WarehouseResponse(1L, "A", 1L);
-        this.warehouseResponse2 = new WarehouseResponse(2L, "B", 2L);
+        this.storeResponse1 = new StoreResponse(1L, 1L, "A");
+        this.storeResponse2 = new StoreResponse(2L, 2L, "B");
     }
 
     @Test
-    void getAllWarehouses() {
+    void getAllStores() {
 
-        List<WarehouseResponse> data = new ArrayList<>();
-        data.add(warehouseResponse1);
-        data.add(warehouseResponse2);
+        List<StoreResponse> data = new ArrayList<>();
+        data.add(storeResponse1);
+        data.add(storeResponse2);
 
         String expectedMessage = "Success";
 
@@ -65,8 +63,8 @@ class WarehouseControllerTests {
                 .data(data)
                 .build();
 
-        when(warehouseService.getAllWarehouses()).thenReturn(expectedResponse);
-        ResponseEntity<BaseResponse> actualResponse = warehouseController.getAll();
+        when(storeService.getAll()).thenReturn(expectedResponse);
+        ResponseEntity<BaseResponse> actualResponse = storeController.getAllStore();
 
         Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());
@@ -74,18 +72,18 @@ class WarehouseControllerTests {
     }
 
     @Test
-    void getWarehouseById() {
+    void getStoreById() {
         String expectedMessage = "Success";
-        WarehouseResponse expectedData = warehouseResponse1;
+        StoreResponse expectedData = storeResponse1;
 
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
                 .data(expectedData)
                 .build();
 
-        when(warehouseService.getWarehouseById(warehouse1.getId())).thenReturn(expectedResponse);
+        when(storeService.getStoreById(store1.getId())).thenReturn(expectedResponse);
 
-        ResponseEntity<BaseResponse> actualResponse = warehouseController.getById(warehouse1.getId());
+        ResponseEntity<BaseResponse> actualResponse = storeController.getStoreById(store1.getId());
 
         Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());
@@ -93,20 +91,20 @@ class WarehouseControllerTests {
     }
 
     @Test
-    void saveWarehouse() {
-        WarehouseRequest request = warehouseRequest;
+    void saveStore() {
+        StoreRequest request = storeRequest;
 
-        String expectedMessage = "Warehouse succesfully added";
-        WarehouseResponse expectedData = warehouseResponse1;
+        String expectedMessage = "Store succesfully added";
+        StoreResponse expectedData = storeResponse1;
 
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
                 .data(expectedData)
                 .build();
 
-        when(warehouseService.saveWarehouse(request)).thenReturn(expectedResponse);
+        when(storeService.addStore(request)).thenReturn(expectedResponse);
 
-        ResponseEntity<BaseResponse> actualResponse = warehouseController.save(request);
+        ResponseEntity<BaseResponse> actualResponse = storeController.addStore(request);
 
         Assertions.assertEquals(HttpStatus.CREATED, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());
@@ -114,20 +112,20 @@ class WarehouseControllerTests {
     }
 
     @Test
-    void updateWarehouse() {
-        WarehouseRequest request = warehouseRequest;
+    void updateStore() {
+        StoreRequest request = storeRequest;
 
-        String expectedMessage = "Warehouse succesfully updated!";
-        WarehouseResponse expectedData = warehouseResponse2;
+        String expectedMessage = "Store succesfully updated!";
+        StoreResponse expectedData = storeResponse2;
 
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
                 .data(expectedData)
                 .build();
 
-        when(warehouseService.updateWarehouse(warehouse2.getId(), request)).thenReturn(expectedResponse);
+        when(storeService.updateStore(store2.getId(), request)).thenReturn(expectedResponse);
 
-        ResponseEntity<BaseResponse> actualResponse = warehouseController.updated(warehouse2.getId(), request);
+        ResponseEntity<BaseResponse> actualResponse = storeController.updateStore(store2.getId(), request);
 
         Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());
@@ -135,16 +133,16 @@ class WarehouseControllerTests {
     }
 
     @Test
-    void deleteWarehouse() {
-        String expectedMessage = "Warehouse successfully deleted!";
-        Warehouse expectedData = warehouse1;
+    void deleteStore() {
+        String expectedMessage = "Store successfully deleted!";
+        Store expectedData = store1;
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
                 .data(expectedData)
                 .build();
 
-        when(warehouseService.deleteWarehouse(warehouse1.getId())).thenReturn(expectedResponse);
-        ResponseEntity<BaseResponse> actualResponse = warehouseController.delete(warehouse1.getId());
+        when(storeService.deleteStoreById(store1.getId())).thenReturn(expectedResponse);
+        ResponseEntity<BaseResponse> actualResponse = storeController.deleteStoreById(store1.getId());
 
         Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         Assertions.assertEquals(expectedMessage, actualResponse.getBody().getMessage());

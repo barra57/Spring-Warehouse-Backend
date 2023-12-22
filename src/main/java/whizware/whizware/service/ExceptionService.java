@@ -22,7 +22,6 @@ public class ExceptionService implements AuthenticationEntryPoint {
         String json = mapper.writeValueAsString(BaseResponse.builder()
                 .message("You have no access to this resource")
                 .build());
-        authException.printStackTrace();
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");

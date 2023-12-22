@@ -11,13 +11,14 @@ import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.LocationRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class LocationService {
 
     private final LocationRepository locationRepository;
+
+    private static final String LOCATION_NOT_FOUND_MESSEGE = "Location with ID %d not found";
 
     public BaseResponse getAll() {
 
@@ -32,7 +33,7 @@ public class LocationService {
     }
 
     public BaseResponse getLocById(Long id) {
-        Location data = locationRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Location with ID %d not found", id)));
+        Location data = locationRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format(LOCATION_NOT_FOUND_MESSEGE, id)));
 
         return BaseResponse.builder()
                 .message("Success get location with ID " + id + "!")
@@ -59,50 +60,34 @@ public class LocationService {
 
     public BaseResponse updateLocation(Long id, LocationRequest request) {
 
-        Optional<Location> optLocation = locationRepository.findById(id);
+        Location location = locationRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format(LOCATION_NOT_FOUND_MESSEGE, id)));
 
-        Location location = new Location();
+        location.setId(location.getId());
+        location.setName(request.getName());
+        locationRepository.save(location);
 
-        if (optLocation.isPresent()) {
-            location.setId(optLocation.get().getId());
-            location.setName(request.getName());
-            locationRepository.save(location);
+        LocationResponse data = LocationResponse.builder()
+                .id(location.getId())
+                .name(location.getName())
+                .build();
 
-            LocationResponse data = LocationResponse.builder()
-                    .id(location.getId())
-                    .name(location.getName())
-                    .build();
-
-            return BaseResponse.builder()
-                    .message("Success update data!")
-                    .data(data)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Fail update data with ID " + id)
-                    .data(null)
-                    .build();
-        }
+        return BaseResponse.builder()
+                .message("Success update data!")
+                .data(data)
+                .build();
 
     }
 
     public BaseResponse deleteLocation(Long id) {
 
-        Optional<Location> data = locationRepository.findById(id);
+        Location data = locationRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format(LOCATION_NOT_FOUND_MESSEGE, id)));
 
-        if (data.isPresent()) {
-            locationRepository.deleteById(id);
+        locationRepository.delete(data);
 
-            return BaseResponse.builder()
-                    .message("Success delete data with ID " + id)
-                    .data(null)
-                    .build();
-        } else {
-            return BaseResponse.builder()
-                    .message("Cannot find data with ID " + id)
-                    .data(null)
-                    .build();
-        }
+        return BaseResponse.builder()
+                .message("Success delete data with ID " + id)
+                .data(null)
+                .build();
     }
 
 

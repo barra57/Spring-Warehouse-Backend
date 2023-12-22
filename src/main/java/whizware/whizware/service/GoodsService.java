@@ -110,7 +110,7 @@ public class GoodsService {
 
         goodsRepository.delete(goods);
         return BaseResponse.builder()
-                .message("Warehouse successfully deleted")
+                .message("Goods successfully deleted")
                 .build();
     }
 

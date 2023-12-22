@@ -1,6 +1,7 @@
 package whizware.whizware.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,8 @@ import whizware.whizware.dto.warehouse.WarehouseRequest;
 import whizware.whizware.dto.warehouse.WarehouseResponse;
 import whizware.whizware.entity.Location;
 import whizware.whizware.entity.Warehouse;
+import whizware.whizware.exception.NoContentException;
+import whizware.whizware.exception.NotFoundException;
 import whizware.whizware.repository.LocationRepository;
 import whizware.whizware.repository.WarehouseRepository;
 
@@ -34,22 +37,44 @@ class WarehouseServiceTests {
     @Mock
     LocationRepository locationRepository;
 
+    private Warehouse warehouse1;
+    private Warehouse warehouse2;
+
+    private WarehouseResponse warehouseResponse1;
+    private WarehouseResponse warehouseResponse2;
+
+    private WarehouseRequest warehouseRequest;
+
+    private Location location;
+
+    private Long id;
+
+    @BeforeEach
+    void setUp() {
+        this.warehouse1 = new Warehouse(1L, "A", new Location(1L, "Jakarta"));
+        this.warehouse2 = new Warehouse(2L, "B", new Location(2L, "Bekasi"));
+
+        this.warehouseRequest = new WarehouseRequest("A", 1L);
+
+        this.warehouseResponse1 = new WarehouseResponse(1L, "A", 1L);
+        this.warehouseResponse2 = new WarehouseResponse(2L, "B", 2L);
+
+        this.location = new Location(1L, "Jakarta");
+
+        this.id = warehouse1.getId();
+    }
+
     @Test
     void testGetAllWarehouses() {
-        List<Warehouse> mockData = new ArrayList<>(
-                List.of(
-                        generateWarehouse(1L, "A", generateLocation(1L, "Jakarta")),
-                        generateWarehouse(1L, "A", generateLocation(2L, "Bekasi"))
-                )
-        );
+        List<Warehouse> mockData = new ArrayList<>( );
+        mockData.add(warehouse1);
+        mockData.add(warehouse2);
 
-        String expectedMessage = "berhasil";
-        List<WarehouseResponse> expectedData = new ArrayList<>(
-                List.of(
-                        generateWarehouseResponse(mockData.get(0).getId(), mockData.get(0).getName(), mockData.get(0).getLocation().getId()),
-                        generateWarehouseResponse(mockData.get(1).getId(), mockData.get(1).getName(), mockData.get(1).getLocation().getId())
-                )
-        );
+        String expectedMessage = "Success";
+        List<WarehouseResponse> expectedData = new ArrayList<>( );
+        expectedData.add(warehouseResponse1);
+        expectedData.add(warehouseResponse2);
+
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
                 .data(expectedData)
@@ -64,211 +89,119 @@ class WarehouseServiceTests {
     }
 
     @Test
-    void testGetWarehouseWithValidId() {
-        Long id = 1L;
-        Warehouse mockData = generateWarehouse(id, "A", generateLocation(1L, "Jakarta"));
+    void testGetAllWarehousesWithEmptyList() {
+        List<Warehouse> mockData = new ArrayList<>();
 
-        String expectedMessage = "berhasil";
-        WarehouseResponse expectedData = generateWarehouseResponse(mockData.getId(), mockData.getName(), mockData.getLocation().getId());
+        when(warehouseRepository.findAll()).thenReturn(mockData);
+
+        Assertions.assertThrows(NoContentException.class, () -> warehouseService.getAllWarehouses()); // This will throw
+    }
+
+    @Test
+    void testGetWarehouseWithValidId() {
+        String expectedMessage = "Success";
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
-                .data(expectedData)
+                .data(warehouseResponse1)
                 .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.of(mockData));
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.of(warehouse1));
 
-        BaseResponse actualResponse = warehouseService.getWarehouseById(id);
+        BaseResponse actualResponse = warehouseService.getWarehouseById(warehouse1.getId());
         WarehouseResponse actualData = (WarehouseResponse) actualResponse.getData();
 
         Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
-        Assertions.assertEquals(expectedData.getLocationId(), actualData.getLocationId());
+        Assertions.assertEquals(warehouseResponse1.getId(), actualData.getId());
+        Assertions.assertEquals(warehouseResponse1.getName(), actualData.getName());
+        Assertions.assertEquals(warehouseResponse1.getLocationId(), actualData.getLocationId());
     }
 
     @Test
     void testGetWarehouseWithInvalidId() {
-        Long id = 1L;
-
-        String expectedMessage = "Warehouse with ID " + id + " not found";
-        BaseResponse expectedResponse = BaseResponse.builder()
-                .message(expectedMessage)
-                .data(null)
-                .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.empty());
-
-        BaseResponse actualResponse = warehouseService.getWarehouseById(id);
-
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(NotFoundException.class, () -> warehouseService.getWarehouseById(id));
     }
 
     @Test
     void testSaveWarehouse() {
-        Long id = 1L;
-        WarehouseRequest request = generateWarehouseRequest("A", 2L);
-        Location mockLocation = generateLocation(request.getLocationId(), "Jakarta");
-        Warehouse mockData = generateWarehouse(id, request.getName(), mockLocation);
-
         String expectedMessage = "Warehouse successfully added";
-        WarehouseResponse expectedData = generateWarehouseResponse(
-                mockData.getId(),
-                mockData.getName(),
-                mockData.getLocation().getId()
-        );
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
-                .data(expectedData)
+                .data(warehouseResponse1)
                 .build();
-        when(locationRepository.findById(request.getLocationId())).thenReturn(Optional.of(mockLocation));
-        when(warehouseRepository.save(any())).thenReturn(mockData);
+        when(locationRepository.findById(warehouseRequest.getLocationId())).thenReturn(Optional.of(location));
+        when(warehouseRepository.save(any())).thenReturn(warehouse1);
 
-        BaseResponse actualResponse = warehouseService.saveWarehouse(request);
+        BaseResponse actualResponse = warehouseService.saveWarehouse(warehouseRequest);
         WarehouseResponse actualData = (WarehouseResponse) actualResponse.getData();
 
         Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
-        Assertions.assertEquals(expectedData.getLocationId(), actualData.getLocationId());
+        Assertions.assertEquals(warehouseResponse1.getId(), actualData.getId());
+        Assertions.assertEquals(warehouseResponse1.getName(), actualData.getName());
+        Assertions.assertEquals(warehouseResponse1.getLocationId(), actualData.getLocationId());
     }
 
     @Test
     void testSaveWarehouseWithInvalidLocationId() {
-        Long id = 1L;
-        WarehouseRequest request = generateWarehouseRequest("A", 2L);
-        Location mockLocation = generateLocation(request.getLocationId(), "Jakarta");
-        Warehouse mockData = generateWarehouse(id, request.getName(), mockLocation);
-
-        String expectedMessage = "Location with ID " + request.getLocationId() + " is not found";
-        WarehouseResponse expectedData = generateWarehouseResponse(
-                mockData.getId(),
-                mockData.getName(),
-                mockData.getLocation().getId()
-        );
-        BaseResponse expectedResponse = BaseResponse.builder()
-                .message(expectedMessage)
-                .data(expectedData)
-                .build();
-
+        WarehouseRequest request = warehouseRequest;
         when(locationRepository.findById(request.getLocationId())).thenReturn(Optional.empty());
-
-        BaseResponse actualResponse = warehouseService.saveWarehouse(request);
-
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        Assertions.assertThrows(NotFoundException.class, () -> warehouseService.saveWarehouse(request));
     }
 
     @Test
     void testUpdateWarehouse() {
-        Long id = 1L;
-        WarehouseRequest request = generateWarehouseRequest("A", 2L);
-        Location mockLocation = generateLocation(request.getLocationId(), "Jakarta");
-        Warehouse mockData = generateWarehouse(id, "B", mockLocation);
-        Warehouse mockDataUpdated = generateWarehouse(id, request.getName(), mockLocation);
-
         String expectedMessage = "Warehouse successfully updated";
-        WarehouseResponse expectedData = generateWarehouseResponse(
-                mockDataUpdated.getId(),
-                mockDataUpdated.getName(),
-                mockDataUpdated.getLocation().getId()
-        );
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
-                .data(expectedData)
+                .data(warehouseResponse2)
                 .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.of(mockData));
-        when(locationRepository.findById(request.getLocationId())).thenReturn(Optional.of(mockLocation));
-        when(warehouseRepository.save(any())).thenReturn(mockDataUpdated);
+        when(warehouseRepository.findById(warehouse2.getId())).thenReturn(Optional.of(warehouse2));
+        when(locationRepository.findById(warehouse2.getLocation().getId())).thenReturn(Optional.of(location));
+        when(warehouseRepository.save(any())).thenReturn(warehouse1);
 
-        BaseResponse actualResponse = warehouseService.updateWarehouse(id, request);
+        BaseResponse actualResponse = warehouseService.updateWarehouse(warehouse2.getId(), warehouseRequest);
         WarehouseResponse actualData = (WarehouseResponse) actualResponse.getData();
 
         Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
-        Assertions.assertEquals(expectedData.getLocationId(), actualData.getLocationId());
+        Assertions.assertEquals(warehouseResponse1.getId(), actualData.getId());
+        Assertions.assertEquals(warehouseResponse1.getName(), actualData.getName());
+        Assertions.assertEquals(warehouseResponse1.getLocationId(), actualData.getLocationId());
     }
 
     @Test
     void testUpdateWarehouseWithInvalidWarehouseId() {
-        Long id = 1L;
         WarehouseRequest request = generateWarehouseRequest("A", 2L);
 
-        String expectedMessage = "Warehouse with ID " + id + " not found";
-        BaseResponse expectedResponse = BaseResponse.builder()
-                .message(expectedMessage)
-                .data(null)
-                .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.empty());
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.empty());
 
-        BaseResponse actualResponse = warehouseService.updateWarehouse(id, request);
-
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        Assertions.assertThrows(NotFoundException.class, () -> warehouseService.updateWarehouse(id, request));
     }
 
     @Test
     void testUpdateWarehouseWithInvalidLocationId() {
-        Long id = 1L;
-        WarehouseRequest request = generateWarehouseRequest("A", 2L);
-        Location mockLocation = generateLocation(1L, "Jakarta");
-        Warehouse mockData = generateWarehouse(id, "B", mockLocation);
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.of(warehouse1));
+        when(locationRepository.findById(warehouseRequest.getLocationId())).thenReturn(Optional.empty());
 
-        String expectedMessage = "Location with ID " + id + " not found";
-        BaseResponse expectedResponse = BaseResponse.builder()
-                .message(expectedMessage)
-                .data(null)
-                .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.of(mockData));
-        when(locationRepository.findById(request.getLocationId())).thenReturn(Optional.empty());
-
-        BaseResponse actualResponse = warehouseService.updateWarehouse(id, request);
-
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        Assertions.assertThrows(NotFoundException.class, () -> warehouseService.updateWarehouse(id, warehouseRequest));
     }
 
     @Test
     void testDeleteWarehouse() {
-        Long id = 1L;
-        Location mockLocation = generateLocation(2L, "Jakarta");
-        Warehouse mockData = generateWarehouse(id, "B", mockLocation);
-
         String expectedMessage = "Warehouse successfully deleted";
-        Warehouse expectedData = generateWarehouse(
-                mockData.getId(),
-                mockData.getName(),
-                mockData.getLocation()
-        );
         BaseResponse expectedResponse = BaseResponse.builder()
                 .message(expectedMessage)
-                .data(expectedData)
+                .data(warehouse1)
                 .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.of(mockData));
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.of(warehouse1));
 
-        BaseResponse actualResponse = warehouseService.deleteWarehouse(id);
-        Warehouse actualData = (Warehouse) actualResponse.getData();
+        BaseResponse actualResponse = Assertions.assertDoesNotThrow(() -> warehouseService.deleteWarehouse(warehouse1.getId()));
 
         Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedData.getId(), actualData.getId());
-        Assertions.assertEquals(expectedData.getName(), actualData.getName());
-        Assertions.assertEquals(expectedData.getLocation().getId(), actualData.getLocation().getId());
     }
 
     @Test
     void testDeleteWarehouseWithInvalidId() {
-        Long id = 1L;
-
-        String expectedMessage = "Warehouse with ID " + id + " not found";
-        BaseResponse expectedResponse = BaseResponse.builder()
-                .message(expectedMessage)
-                .data(null)
-                .build();
-        when(warehouseRepository.findById(id)).thenReturn(Optional.empty());
-
-        BaseResponse actualResponse = warehouseService.deleteWarehouse(id);
-
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertNull(actualResponse.getData());
+        when(warehouseRepository.findById(warehouse1.getId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(NotFoundException.class, () -> warehouseService.deleteWarehouse(id));
     }
 
 }

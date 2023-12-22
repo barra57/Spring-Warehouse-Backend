@@ -51,7 +51,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
         return BaseResponse.builder()
-                .message("Login success")
+                .message("Register success")
                 .data(RegisterResponse.builder()
                         .id(savedUser.getId())
                         .username(savedUser.getUsername())
@@ -73,7 +73,7 @@ public class AuthService {
         username = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Username not found"));
 
-        if (jwtService.isTokenValid(refreshToken, user)) {
+        if (!jwtService.isTokenValid(refreshToken, user)) {
             throw new UnauthorizedException("Invalid refresh token");
         }
         String token = jwtService.generateToken(user);

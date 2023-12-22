@@ -16,10 +16,12 @@ import whizware.whizware.service.LocationService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
-import static whizware.whizware.util.TestUtilities.generateLocation;
+//import static whizware.whizware.util.TestUtilities.generateLocation;
 
 class LocationControllerTest {
     @InjectMocks
@@ -34,18 +36,14 @@ class LocationControllerTest {
 
     @Test
     void testAddLocation() {
-
         LocationRequest request = new LocationRequest("Serang");
-
         LocationResponse data = new LocationResponse(4L, "Serang");
-
         BaseResponse response = BaseResponse.builder()
                 .message("Successfully added data!")
                 .data(data)
                 .build();
 
         when(locationService.addLocation(request)).thenReturn(response);
-
         ResponseEntity<BaseResponse> responseEntity = locationController.addLoc(request);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -54,7 +52,6 @@ class LocationControllerTest {
 
     @Test
     void getAllLocationTest() {
-
         LocationResponse response1 = new LocationResponse(1L, "Tangerang");
         LocationResponse response2 = new LocationResponse(2L, "Jakarta Timur");
         LocationResponse response3 = new LocationResponse(3L, "Jakarta Barat");
@@ -66,9 +63,7 @@ class LocationControllerTest {
                 .data(data)
                 .build();
 
-
         when(locationService.getAll()).thenReturn(response);
-
         ResponseEntity<BaseResponse> actualResponse = locationController.getAll();
 
         assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
@@ -93,24 +88,6 @@ class LocationControllerTest {
 
         assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         assertEquals(response, actualResponse.getBody());
-    }
-
-    @Test
-    void getLocationWithInvalidId() {
-        Long id = 1L;
-
-        BaseResponse response = BaseResponse.builder()
-                .message("Cannot find location with ID " + id)
-                .data(null)
-                .build();
-
-        when(locationService.getLocById(id)).thenReturn(response);
-
-        ResponseEntity<BaseResponse> actualResponse = locationController.getById(id);
-
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
-        Assertions.assertEquals(response.getMessage(), actualResponse.getBody().getMessage());
-        Assertions.assertNull(actualResponse.getBody().getData());
     }
 
     @Test
@@ -142,22 +119,20 @@ class LocationControllerTest {
         Long id = 1L;
 
         Location location = new Location();
-        location.setId(1L);
+        location.setId(id);
         location.setName("Tangerang");
 
-        Location expectedData = generateLocation(id, "Jakarta");
-
         BaseResponse expectedResponse = BaseResponse.builder()
-                .message("Success delete data")
-                .data(expectedData)
+                .message("Success delete data with ID " + id)
+                .data(null)
                 .build();
 
         when(locationService.deleteLocation(id)).thenReturn(expectedResponse);
-
         ResponseEntity<BaseResponse> actualResponse = locationController.deleteLocation(id);
-        Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getBody().getMessage());
-        Assertions.assertNotNull(actualResponse.getBody().getData());
+
+        assertNull(expectedResponse.getData());
+        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getBody().getMessage());
     }
 
 }
